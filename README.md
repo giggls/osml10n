@@ -9,6 +9,9 @@ This is when the first versions of the OSMl10n functions were born.
 At this time implementing them in PL/pgSQL as PostgreSQL stored procedures
 seemed to be a natural choice.
 
+Actually this is what the [current implementation](https://github.com/giggls/mapnik-german-l10n)
+still does.
+
 However starting in 2019 this approach started to show a couple of
 limitations.
 
@@ -32,11 +35,11 @@ of this repository.  Currently missing (May 2020) are the l10n functions
 themselves which I plan to re implement in lua which will make them usable in
 osm2pgsql during import stage.
 
-At least in theory it should also be possible to call the daemon from
-PostgreSQL stored procedures, but in the meantime I think, that doing this
-stuff at import time is the better place.
+What I already have is ``cc_transcript_via_daemon.sql`` which replaces the
+stored procedure for transcription by a call to this daemon.
 
-If you have an Idea for a better approach feel free to open an issue here.
+If you have an idea for a better approach feel free to open an issue here.
+
 
 ## Installation of the transcription-daemon
 
@@ -56,11 +59,15 @@ From Debian package or pip3:
 ```
 curl --data "142/43/東京" http://localhost:8080
 Toukyou
+curl --data "jp/東京" http://localhost:8080
+Toukyou
 ```
 
 ### China
 ```
 curl --data "130/43/東京" http://localhost:8080
+dōng jīng
+curl --data "cn/東京" http://localhost:8080
 dōng jīng
 ```
 
@@ -68,11 +75,15 @@ dōng jīng
 ```
 curl --data "101/16/ห้องสมุดประชาชน" http://localhost:8080
 hongsamut prachachon
+curl --data "th/ห้องสมุดประชาชน" http://localhost:8080
+hongsamut prachachon
 ```
 
 ### Macau
 ```
 curl --data "113.6/22.1/香港" http://localhost:8080
+hōeng góng
+curl --data "mo/香港" http://localhost:8080
 hōeng góng
 ```
 
@@ -80,4 +91,7 @@ hōeng góng
 ```
 curl --data "113.9/22.25/香港" http://localhost:8080
 hōeng góng
+curl --data "hk/香港" http://localhost:8080
+hōeng góng
 ```
+

@@ -92,6 +92,7 @@ class transcriptor:
     self.kakasi_converter  = kakasi.getConverter()
   
   def transcript(self, country, unistr):
+    vout("doing transcription for %s (country %s)\n" % (unistr,country))
     if country == 'jp':
       return(self.kakasi_converter.do(unistr))
     
@@ -112,8 +113,15 @@ class Coord2Country_psql:
       WHERE st_contains(geometry, st_transform(ST_GeomFromText('POINT(%s %s)', 4326),4326))
       ORDER BY area LIMIT 1;
       """
-      self.conn = psycopg2.connect(args.dbcon)
+      try:
+        self.conn = psycopg2.connect(args.dbcon)
+      except:
+        sys.stderr.write("Unable to connect to database using %s " % args.dbcon)
+        sys.stderr.write("falling back to countrycode-only mode\n")
+        self.ready = False
+        return
       self.cur = self.conn.cursor()
+      self.ready = True
   def getCountry(self,lon,lat):
     try:
       self.cur.execute(self.sql % (lon,lat))
@@ -130,8 +138,10 @@ class Coord2Country_sqlite:
     # check if sqlite file is available
     fn = os.path.realpath(args.sqlitefile)
     if not os.path.isfile(fn):
-      sys.stderr.write("Unable to open SQLITE file: %s\n" % args.sqlitefile)
-      sys.exit(1)
+      sys.stderr.write("Unable to open SQLITE file %s, " % args.sqlitefile)
+      sys.stderr.write("falling back to countrycode-only mode\n")
+      self.ready = False
+      return
     import sqlite3
     self.sql = """
     SELECT country_code from country_osm_grid
@@ -142,6 +152,7 @@ class Coord2Country_sqlite:
     self.conn.enable_load_extension(True)
     self.conn.load_extension("mod_spatialite")
     self.cur = self.conn.cursor()
+    self.ready = True
 
   def getCountry(self,lon,lat):
     self.cur.execute(self.sql % (lon,lat))
@@ -157,6 +168,7 @@ class Coord2Country:
     else:
       vout("Using SQLITE for country_osm_grid!\n")
       self.co2c = Coord2Country_sqlite()
+    self.ready = self.co2c.ready
   def getCountry(self,lon,lat):
     country = self.co2c.getCountry(lon,lat)
     vout("country for %s/%s is: %s\n" % (lon,lat,country))
@@ -176,8 +188,22 @@ class httpServer(BaseHTTPRequestHandler):
   def do_POST(self):
     content_length = int(self.headers['Content-Length'])
     post_data = self.rfile.read(content_length).decode('utf-8')
-    (lon,lat,name) = post_data.split('/',2)
-    cc=httpServer.co2c.getCountry(lon,lat)
+    # We support the following post data
+    # cc/string
+    # lon/lat/string
+    qs = post_data.split('/',2)
+    if (len(qs) == 2):
+      (cc,name) = qs
+    else:
+      (lon,lat,name) = qs
+      if httpServer.co2c.ready:
+        cc=httpServer.co2c.getCountry(lon,lat)
+      else:
+        cc = ""
+
+    self.send_response(200)
+    self.send_header("Content-type", "text/plain; charset=UTF-8")
+    self.end_headers()
     self.wfile.write(bytes(httpServer.tc.transcript(cc,name),"utf-8"))
 
   def log_message(self, format, *args):
