@@ -73,6 +73,23 @@ def thai_transcript(inpstr):
       latin=latin+st
   return(latin)
 
+def cantonese_transcript(inpstr):
+  stlist=split_by_alphabet(inpstr)
+
+  latin = ''
+  for st in stlist:
+    if (unicodedata.name(st[0]).split(' ')[0] == 'CJK'):
+      transcript=''
+      try:
+        transcript=pinyin_jyutping_sentence.jyutping(st, spaces=True)
+      except:
+        sys.stderr.write("pinyin_jyutping_sentence error transcribing >%s<\n" % st)
+        return(None)
+      latin=latin+transcript
+    else:
+      latin=latin+st
+  return(latin)
+
 class transcriptor:
   def __init__(self):
 
@@ -100,7 +117,7 @@ class transcriptor:
       return(thai_transcript(unistr))
       
     if country in ['mo','hk']:
-      return(pinyin_jyutping_sentence.jyutping(unistr, spaces=True))
+      return(cantonese_transcript(unistr))
   
     return(unicodedata.normalize('NFC', self.icutr(unistr)))
 
