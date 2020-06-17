@@ -127,7 +127,7 @@ class Coord2Country_psql:
       import psycopg2
       self.sql = """
       SELECT country_code from country_osm_grid
-      WHERE st_contains(geometry, st_transform(ST_GeomFromText('POINT(%s %s)', 4326),4326))
+      WHERE st_contains(geometry, ST_GeomFromText('POINT(%s %s)', 4326))
       ORDER BY area LIMIT 1;
       """
       try:
@@ -161,9 +161,15 @@ class Coord2Country_sqlite:
       return
     import sqlite3
     self.sql = """
-    SELECT country_code from country_osm_grid
-    WHERE st_contains(geometry, st_transform(ST_GeomFromText('POINT(%s %s)', 4326),4326))
-    ORDER BY area LIMIT 1;
+    SELECT country_code
+    FROM country_osm_grid
+    WHERE st_contains(geometry, ST_GeomFromText('POINT(%s %s)', 4326))
+    AND ROWID IN (
+      SELECT ROWID
+      FROM SpatialIndex
+      WHERE f_table_name = 'country_osm_grid'
+      AND search_frame = ST_GeomFromText('POINT(%s %s)', 4326)
+    ) ORDER BY area LIMIT 1;
     """
     self.conn = sqlite3.connect(fn)
     self.conn.enable_load_extension(True)
@@ -172,7 +178,7 @@ class Coord2Country_sqlite:
     self.ready = True
 
   def getCountry(self,lon,lat):
-    self.cur.execute(self.sql % (lon,lat))
+    self.cur.execute(self.sql % (lon,lat,lon,lat))
     rows = self.cur.fetchall()
     return(rows[0][0])
 
