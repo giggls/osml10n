@@ -1,0 +1,5 @@
+unaccent.so
+debian/lua-unaccent
+debian/debhelper-build-stamp
+debian/.debhelper/
+debian/lua-unaccent.substvars

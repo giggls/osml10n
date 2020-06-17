@@ -1,0 +1,5 @@
+lua-unaccent (1.8-1) unstable; urgency=medium
+
+  * Initial release based on libunac 1.8
+
+ -- Sven Geggus <sven-debian@geggus.net>  Wed, 01 Jul 2020 13:49:53 +0200
