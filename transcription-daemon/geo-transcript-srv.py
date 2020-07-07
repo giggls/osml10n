@@ -111,7 +111,8 @@ class transcriptor:
   def transcript(self, country, unistr):
     vout("doing transcription for %s (country %s)\n" % (unistr,country))
     if country == 'jp':
-      return(self.kakasi_converter.do(unistr))
+      kanji = self.kakasi_converter.do(unistr)
+      return(' '.join(kanji.split()))
     
     if country == 'th':
       return(thai_transcript(unistr))
