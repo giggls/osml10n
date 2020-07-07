@@ -6,9 +6,14 @@ local http = require"socket.http"
 local ltn12 = require"ltn12"
 
 function osml10n.geo_transcript(name,bbox)
-  local lon = (bbox[1]+bbox[3])/2.0
-  local lat = (bbox[2]+bbox[4])/2.0
-  local reqbody = lon .. "/" .. lat .. "/" .. name
+  local lon,lat,reqbody
+  if (bbox == nil) then
+    reqbody = "/" .. "/" .. name
+  else
+    lon = (bbox[1]+bbox[3])/2.0
+    lat = (bbox[2]+bbox[4])/2.0
+    reqbody = lon .. "/" .. lat .. "/" .. name
+  end
   local respbody = {} -- for the response body
   local result, respcode, respheaders, respstatus = http.request {
     method = "POST",

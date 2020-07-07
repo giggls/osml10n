@@ -173,20 +173,6 @@ function osml10n.street_abbrev_uk(longname)
   return abbrev
 end
 
-function osml10n.street_abbrev_latin(longname)
-  local abbrev = longname
-  
-  return longname
-end
-
-function osml10n.street_abbrev_non_latin(longname)
-  return longname
-end
-
-function osml10n.street_abbrev_all(longname)
-  return longname
-end
-
 -- definition of latin abbrev functions
 local abbrev_func_latin = {
   de = osml10n.street_abbrev_de,
@@ -214,6 +200,30 @@ function osml10n.street_abbrev(longname,langcode)
     return(longname)
   end
   return abbrev_func_all[langcode](longname)
+end
+
+function osml10n.street_abbrev_latin(longname)
+  local abbrev = longname
+  for _,v in pairs(abbrev_func_latin) do
+    abbrev = v(abbrev)
+  end
+  return abbrev
+end
+
+function osml10n.street_abbrev_non_latin(longname)
+  local abbrev = longname
+  for _,v in pairs(abbrev_func_non_latin) do
+     abbrev = v(abbrev)
+  end
+  return abbrev
+end
+
+function osml10n.street_abbrev_all(longname)
+  local abbrev = longname
+  for _,v in pairs(abbrev_func_all) do
+    abbrev = v(abbrev)
+  end
+  return abbrev
 end
 
 return osml10n
