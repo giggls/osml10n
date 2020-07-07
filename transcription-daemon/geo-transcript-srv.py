@@ -140,10 +140,16 @@ class Coord2Country_psql:
       self.cur = self.conn.cursor()
       self.ready = True
   def getCountry(self,lon,lat):
+    # if no coordinates are given
+    if (lat == "") and (lon == ""):
+      return('aq')
     try:
       self.cur.execute(self.sql % (lon,lat))
       rows = self.cur.fetchall()
-      return(rows[0][0])
+      if len(rows) == 0:
+        return('aq')
+      else:
+        return(rows[0][0])
     except Exception as e:
       sys.stderr.write("Database query error:\n")
       sys.stderr.write(str(e))
@@ -178,9 +184,15 @@ class Coord2Country_sqlite:
     self.ready = True
 
   def getCountry(self,lon,lat):
+    # if no coordinates are given
+    if (lat == "") and (lon == ""):
+      return('aq')
     self.cur.execute(self.sql % (lon,lat,lon,lat))
     rows = self.cur.fetchall()
-    return(rows[0][0])
+    if len(rows) == 0:
+      return('aq')
+    else:
+      return(rows[0][0])
 
 # convert lon/lat to countrycode via PostgreSQL
 class Coord2Country:
