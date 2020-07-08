@@ -109,7 +109,10 @@ class transcriptor:
     self.kakasi_converter  = kakasi.getConverter()
   
   def transcript(self, country, unistr):
-    vout("doing transcription for %s (country %s)\n" % (unistr,country))
+    if (country == ""):
+      vout("doing non-country specific transcription for >>%s<<\n" % unistr)
+    else:
+      vout("doing transcription for >>%s<< (country %s)\n" % (unistr,country))
     if country == 'jp':
       kanji = self.kakasi_converter.do(unistr)
       return(' '.join(kanji.split()))
@@ -141,14 +144,11 @@ class Coord2Country_psql:
       self.cur = self.conn.cursor()
       self.ready = True
   def getCountry(self,lon,lat):
-    # if no coordinates are given
-    if (lat == "") and (lon == ""):
-      return('aq')
     try:
       self.cur.execute(self.sql % (lon,lat))
       rows = self.cur.fetchall()
       if len(rows) == 0:
-        return('aq')
+        return('')
       else:
         return(rows[0][0])
     except Exception as e:
@@ -185,13 +185,10 @@ class Coord2Country_sqlite:
     self.ready = True
 
   def getCountry(self,lon,lat):
-    # if no coordinates are given
-    if (lat == "") and (lon == ""):
-      return('aq')
     self.cur.execute(self.sql % (lon,lat,lon,lat))
     rows = self.cur.fetchall()
     if len(rows) == 0:
-      return('aq')
+      return('')
     else:
       return(rows[0][0])
 
@@ -206,8 +203,14 @@ class Coord2Country:
       self.co2c = Coord2Country_sqlite()
     self.ready = self.co2c.ready
   def getCountry(self,lon,lat):
+    # if no coordinates are given
+    if (lat == "") and (lon == ""):
+      return('')
     country = self.co2c.getCountry(lon,lat)
-    vout("country for %s/%s is: %s\n" % (lon,lat,country))
+    if (country == ""):
+      vout("country for %s/%s is unknown\n" % (lon,lat))
+    else:
+      vout("country for %s/%s is %s\n" % (lon,lat,country))
     return(country)
 
 class httpServer(BaseHTTPRequestHandler):
