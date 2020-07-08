@@ -6,6 +6,9 @@ local sabbrev = require "osml10n.street_abbrev"
 local helpers = require "osml10n.helper_functions"
 local transcript = require "osml10n.geo_transcript"
 
+-- 5 most commonly spoken languages using latin script (hopefully)
+local latin_langs = {"en","fr","es","pt","de"}
+
 -- get country code from tag or nil in case of no country-code
 function langcode_code_from_tag(tag)
   local s, langcode
@@ -200,12 +203,27 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
   return(resarr)
 end
 
+-- Get name by looking at various name tags or transliteration as a last resort:
+
+-- 1. name:<targetlang>
+-- 2. name (if latin)
+-- 3. int_name (if latin)
+-- 5. name:en (if not targetlang)
+-- 5. name:fr (if not targetlang)
+-- 6. name:es (if not targetlang)
+-- 7: name:pt (if not targetlang)
+-- 8. name:de (if not targetlang)
+-- 9. Any tag of the form name:<targetlang>_rm or name:<targetlang>-Latn
+
+-- This scheme is used in functions:
+-- osml10n.get_names_from_tags and osml10n.get_localized_name_from_tags
+--
+-- While the former returns two names in most cases the latter just returns one!
+
 function osml10n.get_names_from_tags(tags, localized_name_second, is_street, targetlang, place)
   local resarr = {"",""}
   -- default is English now not German
   if (targetlang == nil) then targetlang = "en" end
-  -- 5 most commonly spoken languages using latin script (hopefully)
-  local latin_langs = {"en","fr","es","pt","de"}
   local target_tag = 'name:' .. targetlang
   if (tags[target_tag] ~= nil) then
     return osml10n.gen_combined_names(target_tag,tags,localized_name_second,is_street,true);
@@ -257,6 +275,56 @@ function osml10n.get_names_from_tags(tags, localized_name_second, is_street, tar
       return osml10n.gen_combined_names('name:Latn',tags,localized_name_second,is_street,false,true);  
   else
     return resarr; 
+  end
+end
+
+function osml10n.get_localized_name_from_tags(tags, targetlang, place)
+  local resarr = {"",""}
+  -- default is English now not German
+  if (targetlang == nil) then targetlang = "en" end
+  local target_tag = 'name:' .. targetlang
+  if (tags[target_tag] ~= nil) then
+    return tags[target_tag]
+  end
+  -- at this stage we have no name tagged in target language, but generic "name" tag might be in
+  -- latin script or even in our target language, so, just use it
+  if (tags['name'] ~= nil) then
+    if helpers.is_latin(tags['name']) then
+      return tags['name']
+    end
+    -- at this stage name is not latin so we need to have a look at alternatives
+    -- these are currently int_name, common latin scripts and romanized version of the name
+    if (tags['int_name'] ~= nil) then
+      if helpers.is_latin(tags['int_name']) then
+        return tags['int_name']
+      end
+    end
+
+    -- if any latin language tag is available use it
+    for _,lang in pairs(latin_langs) do
+      -- we already checked for targetlang
+      if (lang ~= targetlang) then
+        target_tag = 'name:' .. lang
+        if (tags[target_tag] ~= nil) then
+          print("found roman language tag " .. lang)
+          return tags[target_tag]
+        end
+      end
+    end
+    -- try to find a romanized version of the name
+    -- this usually looks like name:ja_rm or  name:ko-Latn
+    -- Just use the first tag of this kind found, because
+    -- having more than one of them does not make sense
+    for tag,_ in pairs(tags) do
+      if (string.match(tag,'^name:.+_rm$') or string.match(tag,'^name:.+-Latn$')) then
+        print( 'found romanization name tag ' .. tag)
+        return tags[tag]
+      end
+    end
+    -- do transliteration as a last resort
+    return transcript.geo_transcript(tags['name'],place)
+  else
+    return ''
   end
 end
 
