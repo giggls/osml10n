@@ -111,7 +111,6 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
       -- try to create a better string for combined name than plain name
       -- do these complex checks only in case unaccented name != unaccented local_name
       if (string.len(unacc) == string.len(unacc_local)) then
-        print("brauche test hier 3")
         if is_street then
           resarr[idxn] = sabbrev.street_abbrev(tags[name],langcode)
         else

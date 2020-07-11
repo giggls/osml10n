@@ -163,6 +163,7 @@ print("")
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Москва́ - Moskau‬",{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },true,false, ' - ','de')
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Moskau|Москва́‬",{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },false,false, '|','de')
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","London",{ ["name"] = "London", ["name:de"] = "London", ["name:en"] = "London" },false,false, '|','de')
 
 -- in lua rewriute default is 'en' for language
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Cairo|القاهرة‬", { ["name"] = "القاهرة", ["name:de"] = "Kairo", ["int_name"] = "Cairo", ["name:en"] = "Cairo" },false,false, '|')
