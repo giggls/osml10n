@@ -1,0 +1,5 @@
+osml10n (1.0) unstable; urgency=medium
+
+  * osml10n for lua initial release
+
+ -- Sven Geggus <sven-debian@geggus.net>  Sat, 11 Jul 2020 15:22:35 +0200

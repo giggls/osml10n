@@ -11,6 +11,9 @@ install:
 	cp -a osml10n $(TARGETDIR)
 	chmod -R go+rX $(TARGETDIR)/osml10n
 
+test:
+	./tests/runtests.lua
+
 deb:
 	dpkg-buildpackage -b -uc
 

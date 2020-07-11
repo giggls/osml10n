@@ -1,0 +1,16 @@
+Source: osml10n
+Section: unknown
+Priority: optional
+Maintainer: Sven Geggus <sven-debian@geggus.net>
+Build-Depends: debhelper (>= 11)
+Standards-Version: 4.1.3
+Homepage: https://github.com/giggls/osml10n
+
+Package: osml10n
+Architecture: all
+Depends: lua5.3, lua-unaccent
+Suggests: osm2pgsql
+Description: l10n functions for Openstreetmap tags
+ Localisation functions for Openstreetmap tags to be used in database import
+ with osm2pgsql
+
