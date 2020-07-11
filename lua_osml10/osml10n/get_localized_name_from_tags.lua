@@ -1,10 +1,10 @@
-unaccent = require "unaccent"
-
+local unaccent = require "unaccent"
 
 local osml10n = {}
 local sabbrev = require "osml10n.street_abbrev"
 local helpers = require "osml10n.helper_functions"
 local transcript = require "osml10n.geo_transcript"
+local rex = require "rex_pcre"
 
 -- 5 most commonly spoken languages using latin script (hopefully)
 local latin_langs = {"en","fr","es","pt","de"}

@@ -1,5 +1,7 @@
 local osml10n = {}
 
+local rex = require "rex_pcre"
+
 -- replaces some common parts of German street names with their abbreviation
 function osml10n.street_abbrev_de(longname)
   local abbrev = longname

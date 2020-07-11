@@ -1,7 +1,5 @@
 local osml10n = {}
 
-rex = require "rex_pcre"
-
 local function import(submodule)
   for k,v in pairs(require(submodule)) do
     assert(osml10n[k] == nil, "oops dopplet gemoppelt")

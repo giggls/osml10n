@@ -117,9 +117,11 @@ checkoutput(osml10n.get_country_name,"get_country_name",{ "Indien", "भार�
 checkoutput(osml10n.get_country_name,"get_country_name",{ "India", "भारत" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "en")
 print("")
 
+local scriptdir = debug.getinfo(1).source:match("@?(.*/)")
+
 for _, lang in pairs({"de", "en", "fr"}) do
   -- streetname abbreviations for current language
-  for line in io.lines(lang .. "_tests.csv") do
+  for line in io.lines(scriptdir .. "/" .. lang .. "_tests.csv") do
     local t = {}
     for word in string.gmatch(line, '([^,]+)') do
       table.insert(t,word)
