@@ -15,16 +15,17 @@ still does.
 However starting in 2019 this approach started to show a couple of
 limitations.
 
-Many FOSS transcription libraries are written in the python language thus we
-already had to switch parts of the code to PL/Python.
+Many FOSS transcription libraries are written in the **Python** language thus we
+already had to switch parts of the code to **PL/Python**.
 
-This started for Thai language using tltk which worked good enough. However
-trying to use this approach for Cantonese language using pinyin_jyutping_sentence
+This started for Thai language using [tltk](https://pypi.org/project/tltk/)
+which worked good enough. However trying to use this approach for Cantonese language using
+[pinyin_jyutping_sentence](https://pypi.org/project/pinyin_jyutping_sentence/)
 was way too slow. Importing this library takes a couple of seconds and can
 not be done just once but must be done once per transaction.
 
-Also, we noticed that PostgreSQL has a hard coded limit for pre-compiled
-regular expressions, which we where using quite heavily for street-name
+Also, we noticed that **PostgreSQL** has a hard coded limit for pre-compiled
+Regular Expressions, which we where using quite heavily for street-name
 abbreviations. Exceeding this limit will again slow down queries in an
 unacceptable way.
 
@@ -33,11 +34,14 @@ Discussing other approaches we now came up with the following idea:
 * Have a transcription daemon written in Python
 * Implement a library written in Lua language which can be plugged into the Lua
 tag transformation script of osm2pgsql
-* ``cc_transcript_via_daemon.sql`` is a drop-in replacement for the legacy code
-which uses the daemon for transcription instead of stored procedures. The
-main benefit of using this function is Cantonese transcription support.
 
-If you have an idea for an even better approach feel free to open an issue here.
+As an Alternative ``cc_transcript_via_daemon.sql`` can be used as drop-in
+replacement for the legacy code which uses the daemon for transcription
+instead of stored procedures.  The main benefit of using this function is
+Cantonese transcription support.
+
+If you have an idea for an even better approach than this one feel free to
+open an issue here.
 
 
 ## Installation of the transcription-daemon
