@@ -32,8 +32,9 @@ unacceptable way.
 Discussing other approaches we now came up with the following idea:
 
 * Have a transcription daemon written in Python
-* Implement a library written in Lua language which can be plugged into the Lua
-tag transformation script of osm2pgsql
+* Implement a library written in Lua language which can be plugged into the
+  Lua tag transformation script of [osm2pgsql](https://github.com/openstreetmap/osm2pgsql)
+  (flex backend).
 
 As an Alternative ``cc_transcript_via_daemon.sql`` can be used as drop-in
 replacement for the legacy code which uses the daemon for transcription
