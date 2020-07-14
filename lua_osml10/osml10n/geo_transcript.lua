@@ -7,11 +7,18 @@ local ltn12 = require"ltn12"
 
 function osml10n.geo_transcript(name,bbox)
   local lon,lat,reqbody
+  local bx = {}
   if (bbox == nil) then
     reqbody = "/" .. "/" .. name
   else
-    lon = (bbox[1]+bbox[3])/2.0
-    lat = (bbox[2]+bbox[4])/2.0
+    if (type(bbox) == "function") then
+      bx[1], bx[2], bx[3], bx[4] = bbox()
+    -- asume bbox ist table type otherwise
+    else
+      bx = bbox
+    end
+      lon = (bx[1]+bx[3])/2.0
+      lat = (bx[2]+bx[4])/2.0
     reqbody = lon .. "/" .. lat .. "/" .. name
   end
   local respbody = {} -- for the response body
