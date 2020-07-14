@@ -28,17 +28,16 @@ regular expressions, which we where using quite heavily for street-name
 abbreviations. Exceeding this limit will again slow down queries in an
 unacceptable way.
 
-Discussion other approaches we now came up with the following idea.  In
-future, there will be an external daemon written in python doing geolocation
-aware transcription.  This daemon has already been implemented and is part
-of this repository.  Currently missing (May 2020) are the l10n functions
-themselves which I plan to re implement in lua which will make them usable in
-osm2pgsql during import stage.
+Discussing other approaches we now came up with the following idea:
 
-What I already have is ``cc_transcript_via_daemon.sql`` which replaces the
-stored procedure for transcription by a call to this daemon.
+* Have a transcription daemon written in Python
+* Implement a library written in Lua language which can be plugged into the Lua
+tag transformation script of osm2pgsql
+* ``cc_transcript_via_daemon.sql`` is a drop-in replacement for the legacy code
+which uses the daemon for transcription instead of stored procedures. The
+main benefit of using this function is Cantonese transcription support.
 
-If you have an idea for a better approach feel free to open an issue here.
+If you have an idea for an even better approach feel free to open an issue here.
 
 
 ## Installation of the transcription-daemon
@@ -95,3 +94,19 @@ curl --data "hk/香港" http://localhost:8080
 hōeng góng
 ```
 
+## Installation of the Lua library
+
+**This code will not work with lua versions below 5.3!**
+
+On **Debian/Ubuntu** just call make deb inside ``lua_osml10`` and ``lua_unac``
+directories. This will give you two Debian Packages which can be installed
+on the system.
+
+The code will also need the Lua binding for pcre which unfortunately does
+not seem to be available as a Debian package.  Thus use ``luarocks install
+lrexlib-pcre`` instead.
+
+To test if your installation is working as expected call ``make
+test`` inside the ``lua_osml10`` directory.
+
+Make sure that transcription-daemon is running while running tests.
