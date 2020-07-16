@@ -90,6 +90,24 @@ def cantonese_transcript(inpstr):
       latin=latin+st
   return(latin)
 
+# helper function "contains_thai"
+# checks if string contains Thai language characters
+# 0x0400-0x04FF in unicode table
+def contains_thai(text):
+  for c in text:
+    if (ord(c) > 0x0E00) and (ord(c) < 0x0E7F):
+      return True
+  return False
+
+# helper function "contains_cjk"
+# checks if string contains CJK characters
+# 0x4e00-0x9FFF in unicode table
+def contains_cjk(text):
+  for c in text:
+    if (ord(c) > 0x4e00) and (ord(c) < 0x9FFF):
+      return True
+  return False   
+
 class transcriptor:
   def __init__(self):
 
@@ -235,8 +253,15 @@ class httpServer(BaseHTTPRequestHandler):
       (cc,name) = qs
     else:
       (lon,lat,name) = qs
+      # Do check for country only if string contains Thai or CJK characters
       if httpServer.co2c.ready:
-        cc=httpServer.co2c.getCountry(lon,lat)
+        if (contains_cjk(name)):
+          cc=httpServer.co2c.getCountry(lon,lat)
+        else:
+          if (contains_thai(name)):
+            cc='th'
+          else:
+            cc = ""
       else:
         cc = ""
 
