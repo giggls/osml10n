@@ -174,6 +174,9 @@ checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Brüs
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Brixen|Bressanone‬",
 { ["name"] = "Brixen - Bressanone", ["name:de"] = "Brixen", ["name:it"] = "Bressanone" }, false,false, '|','de')
 
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Brixen|Bressanone‬",
+{ ["name"] = "Brixen - Bressanone", ["name:de"] = "Brixen" }, false,false, '|','de')
+
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Merano|Meran‬",
 { ["name"] = "Merano - Meran",["name:de"] = "Meran",["name:it"] = "Merano" },true,false, '|','de')
 
