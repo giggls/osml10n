@@ -4,7 +4,7 @@ LUAV?=5.3
 TARGETDIR=$(DESTDIR)/usr/lib/x86_64-linux-gnu/lua/$(LUAV)/
 
 unaccent.so: lua_unac.c
-	gcc -Wall -shared -fPIC -o $@ -I/usr/include/lua$(LUAV) -llua$(LUAV) -lunac $<
+	gcc -Wall -shared -fPIC -o $@ -I/usr/include/lua$(LUAV) -llua$(LUAV) -Wl,--no-as-needed -lunac $<
 
 install: unaccent.so
 	install -m 644 unaccent.so $(TARGETDIR)
