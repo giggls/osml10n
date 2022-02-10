@@ -55,11 +55,11 @@ def main():
         geom_area = ops.transform(
         partial(
         pyproj.transform,
-        pyproj.Proj(init='EPSG:4326'),
+        pyproj.Proj('EPSG:4326'),
         pyproj.Proj(
             proj='aea',
-            lat1=poly.bounds[1],
-            lat2=poly.bounds[3])),
+            lat_1=poly.bounds[1],
+            lat_2=poly.bounds[3])),
         poly)
     
         print("%s\t%s\t%s" % (boundary,geom_area.area,h.wkb))

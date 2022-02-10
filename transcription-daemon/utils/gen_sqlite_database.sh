@@ -7,7 +7,7 @@
 output=country_osm_grid.db
 
 echo -n -e "Downloading country_grid.sql.gz from nominatim.org... "
-curl -s http://www.nominatim.org/data/country_grid.sql.gz |gzip -d >country_osm_grid.sql.in
+curl -s https://nominatim.org/data/country_grid.sql.gz |gzip -d >country_osm_grid.sql.in
 echo "done."
 
 echo -n -e "Downloading Hong Kong and Macau boundaries from OSM API... "

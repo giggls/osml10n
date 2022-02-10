@@ -115,16 +115,7 @@ class transcriptor:
     self.icutr = icu.Transliterator.createInstance('Any-Latin').transliterate
 
     # Kanji to Latin transcription instance via pykakasi
-    kakasi = pykakasi.kakasi()
-    kakasi.setMode("H","a")
-    kakasi.setMode("K","a")
-    kakasi.setMode("J","a")
-    kakasi.setMode("r","Hepburn")
-    kakasi.setMode("s", True)
-    kakasi.setMode("E", "a")
-    kakasi.setMode("a", None)
-    kakasi.setMode("C", True)
-    self.kakasi_converter  = kakasi.getConverter()
+    self.kakasi = pykakasi.kakasi()
   
   def transcript(self, country, unistr):
     if (country == ""):
@@ -132,8 +123,14 @@ class transcriptor:
     else:
       vout("doing transcription for >>%s<< (country %s)\n" % (unistr,country))
     if country == 'jp':
-      kanji = self.kakasi_converter.do(unistr)
-      return(' '.join(kanji.split()))
+      # this should mimic the old api behavior (I hate API changes)
+      # new API does not have all options anymore :(
+      kanji = self.kakasi.convert(unistr)
+      out = ""
+      for w in kanji:
+        w['hepburn'] = w['hepburn'].strip()
+        out = out +  w['hepburn'][0].upper() + w['hepburn'][1:] + " "
+      return(out.strip())
     
     if country == 'th':
       return(thai_transcript(unistr))
