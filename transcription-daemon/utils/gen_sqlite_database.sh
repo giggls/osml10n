@@ -1,9 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 #
 # quick and dirty shell-script for converting the postgresql dump
 # country_osm_grid.sql + Hong Kong and Macau boundaries to an sqlite database
 # unfortunately this will currently need a postgresql database
 #
+
+set -euo pipefail
+
 output=country_osm_grid.db
 
 echo -n -e "Downloading country_grid.sql.gz from nominatim.org... "
