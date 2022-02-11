@@ -4,6 +4,11 @@
 # country_osm_grid.sql + Hong Kong and Macau boundaries to an sqlite database
 # unfortunately this will currently need a postgresql database
 #
+# You need:
+# * ogr2ogr
+# * Running PostgreSQL/PostGIS with a database named after the local user with PostGIS enabled
+# * Pyosmium (https://osmcode.org/pyosmium)
+#
 
 set -euo pipefail
 
