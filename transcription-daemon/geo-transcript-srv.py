@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import asyncio
+import struct
+import sys
 
 import argparse
 # as imports are very slow parse arguments first
 parser = argparse.ArgumentParser(description='Server for transcription of names based on geolocation')
 parser.add_argument("-b", "--bindaddr", type=str, default="localhost", help="local bind address")
-parser.add_argument("-p", "--port", default=8080, help="port to listen at")
-parser.add_argument("-v", "--verbose", action='store_true', help="print verbose output")       
+parser.add_argument("-p", "--port", default=8033, help="port to listen at")
+parser.add_argument("-v", "--verbose", action='store_true', help="print verbose output")
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-d', '--dbcon', help='PostgreSQL (psycopg2) connection string')
 group.add_argument('-s', '--sqlitefile', default='country_osm_grid.db', help='SQLITE file')
@@ -18,8 +20,6 @@ def vout(msg):
   if args.verbose:
     sys.stdout.write(msg)
     sys.stdout.flush()
-
-import sys
 
 sys.stdout.write("Loading osml10n transcription server: ")
 sys.stdout.flush()
@@ -106,7 +106,7 @@ def contains_cjk(text):
   for c in text:
     if (ord(c) > 0x4e00) and (ord(c) < 0x9FFF):
       return True
-  return False   
+  return False
 
 class transcriptor:
   def __init__(self):
@@ -116,7 +116,7 @@ class transcriptor:
 
     # Kanji to Latin transcription instance via pykakasi
     self.kakasi = pykakasi.kakasi()
-  
+
   def transcript(self, country, unistr):
     if (country == ""):
       vout("doing non-country specific transcription for >>%s<<\n" % unistr)
@@ -132,13 +132,13 @@ class transcriptor:
         if (len(w['hepburn']) > 0):
           out = out +  w['hepburn'].capitalize() + " "
       return(out.strip())
-    
+
     if country == 'th':
       return(thai_transcript(unistr))
-      
+
     if country in ['mo','hk']:
       return(cantonese_transcript(unistr))
-  
+
     return(unicodedata.normalize('NFC', self.icutr(unistr)))
 
 # convert lon/lat to countrycode via PostgreSQL
@@ -229,57 +229,85 @@ class Coord2Country:
       vout("country for %s/%s is %s\n" % (lon,lat,country))
     return(country)
 
-class httpServer(BaseHTTPRequestHandler):
+co2c = Coord2Country()
+tc = transcriptor()
 
-  co2c=Coord2Country()
-  tc=transcriptor()
-
-  def do_GET(self):
-    self.send_response(200)
-    self.send_header("Content-type", "text/plain")
-    self.end_headers()
-    self.wfile.write(b"This server is POST only!\n")
-
-  def do_POST(self):
-    content_length = int(self.headers['Content-Length'])
-    post_data = self.rfile.read(content_length).decode('utf-8')
-    # We support the following post data
-    # cc/string
-    # lon/lat/string
-    qs = post_data.split('/',2)
-    if (len(qs) == 2):
-      (cc,name) = qs
-    else:
-      (lon,lat,name) = qs
-      # Do check for country only if string contains Thai or CJK characters
-      if httpServer.co2c.ready:
-        if (contains_cjk(name)):
-          cc=httpServer.co2c.getCountry(lon,lat)
-        else:
-          if (contains_thai(name)):
-            cc='th'
-          else:
-            cc = ""
-      else:
-        cc = ""
-
-    self.send_response(200)
-    self.send_header("Content-type", "text/plain; charset=UTF-8")
-    self.end_headers()
-    self.wfile.write(bytes(httpServer.tc.transcript(cc,name),"utf-8"))
-
-  def log_message(self, format, *args):
+# Read a request from the socket. First read 4 bytes containing the length
+# of the request data, then read the data itself and return as a UTF-8 string.
+# Return 'None' if the connection was closed.
+async def read_request(reader):
+  try:
+    lendata = await reader.readexactly(4)
+    if len(lendata) == 0:
+      return
+    length = struct.unpack('I', lendata)
+    if length == 0:
+      return
+    data = await reader.readexactly(length[0])
+    return data.decode('utf-8')
+  except asyncio.exceptions.IncompleteReadError:
     return
 
+# Write the reply data to the socket and flush. First writes 4 bytes containing
+# the length of the data and then the data itself.
+async def send_reply(writer, reply):
+  data = reply.encode('utf-8')
+  length = len(data)
+  writer.write(struct.pack('I', length) + data)
+  await writer.drain()
 
+async def handle_connection(reader, writer):
+    vout('New connection\n')
+    while True:
+      data = await read_request(reader)
+      if data is None:
+        vout('Connection closed\n')
+        return
+
+      # We support the following formats:
+      # id/cc/string
+      # id/lon/lat/string
+      qs = data.split('/',3)
+      if len(qs) == 3:
+        (id,cc,name) = qs
+      else:
+        (id,lon,lat,name) = qs
+        # Do check for country only if string contains Thai or CJK characters
+        if co2c.ready:
+          if contains_cjk(name):
+            cc = co2c.getCountry(lon,lat)
+          else:
+            if contains_thai(name):
+              cc = 'th'
+            else:
+              cc = ''
+        else:
+          cc = ''
+
+      try:
+        if name != '':
+          reply = tc.transcript(cc,name)
+        else:
+          reply = ''
+
+        if isinstance(reply, str):
+          await send_reply(writer, reply)
+        else:
+          sys.stderr.write(f"Error in id '{id}': transcript('{cc}','{name}') returned non-string '{reply}'\n")
+          await send_reply(writer, '')
+      except BaseException as err:
+        sys.stderr.write(f"Error in id '{id}': {err}, {type(err)}\n")
+        await send_reply(writer, '')
+
+async def main():
+  server = await asyncio.start_server(handle_connection, host=args.bindaddr, port=args.port, reuse_address=True, reuse_port=True)
+  addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
+  vout(f'Serving on {addrs}\n')
+
+  async with server:
+    await server.serve_forever()
 
 if __name__ == "__main__":
-  webServer = HTTPServer((args.bindaddr, args.port), httpServer)
-
   sys.stdout.write("ready.\n")
-  try:
-    webServer.serve_forever()
-  except KeyboardInterrupt:
-    pass
+  asyncio.run(main())
 
-  webServer.server_close()
