@@ -1,6 +1,6 @@
 # A new approach for Openstreetmap l10n
 
-Right after I got the maintainer of the [German Mapnik style](https://github.com/giggls/openstreetmap-carto-de)
+Right after I got to be the maintainer of the [German Mapnik style](https://github.com/giggls/openstreetmap-carto-de)
 in 2012 I immediately thought that it would be nice to have Latin labels on
 my map rather than the respective local script.
 
@@ -25,7 +25,7 @@ was way too slow. Importing this library takes a couple of seconds and can
 not be done just once but must be done once per transaction.
 
 Also, we noticed that **PostgreSQL** has a hard coded limit for pre-compiled
-Regular Expressions, which we where using quite heavily for street-name
+regular expressions, which we were using quite heavily for street-name
 abbreviations. Exceeding this limit will again slow down queries in an
 unacceptable way.
 
@@ -36,7 +36,7 @@ Discussing other approaches we now came up with the following idea:
   Lua tag transformation script of [osm2pgsql](https://github.com/openstreetmap/osm2pgsql)
   (flex backend).
 
-As an Alternative ``cc_transcript_via_daemon.sql`` can be used as drop-in
+As an alternative ``cc_transcript_via_daemon.sql`` can be used as drop-in
 replacement for the legacy code which uses the daemon for transcription
 instead of stored procedures.  The main benefit of using this function is
 Cantonese transcription support.
@@ -48,7 +48,7 @@ open an issue here.
 ## Installation of the transcription-daemon
 
 ```
-apt install python3-psycopg2
+apt install libsqlite3-mod-spatialite python3-icu python3-psycopg2
 
 pip3 install pykakasi
 pip3 install tltk
@@ -103,8 +103,14 @@ hōeng góng
 
 **This code will not work with lua versions below 5.3!**
 
+Install prerequisites:
+
+```
+apt install libunac1-dev luarocks
+```
+
 On **Debian/Ubuntu** just call make deb inside ``lua_osml10`` and ``lua_unac``
-directories. This will give you two Debian Packages which can be installed
+directories. This will give you two Debian packages which can be installed
 on the system.
 
 The code will also need the Lua binding for pcre which unfortunately does
