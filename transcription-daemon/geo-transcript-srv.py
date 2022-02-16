@@ -129,7 +129,8 @@ class transcriptor:
       out = ""
       for w in kanji:
         w['hepburn'] = w['hepburn'].strip()
-        out = out +  w['hepburn'][0].upper() + w['hepburn'][1:] + " "
+        if (len(w['hepburn']) > 0):
+          out = out +  w['hepburn'].capitalize() + " "
       return(out.strip())
     
     if country == 'th':
