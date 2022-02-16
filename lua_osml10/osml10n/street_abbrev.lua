@@ -206,25 +206,25 @@ end
 
 function osml10n.street_abbrev_latin(longname)
   local abbrev = longname
-  for _,v in pairs(abbrev_func_latin) do
-    abbrev = v(abbrev)
-  end
+  abbrev = osml10n.street_abbrev_en(abbrev)
+  abbrev = osml10n.street_abbrev_de(abbrev)
+  abbrev = osml10n.street_abbrev_fr(abbrev)
+  abbrev = osml10n.street_abbrev_es(abbrev)
+  abbrev = osml10n.street_abbrev_pt(abbrev)
   return abbrev
 end
 
 function osml10n.street_abbrev_non_latin(longname)
   local abbrev = longname
-  for _,v in pairs(abbrev_func_non_latin) do
-     abbrev = v(abbrev)
-  end
+  abbrev = osml10n.street_abbrev_ru(abbrev)
+  abbrev = osml10n.street_abbrev_uk(abbrev)
   return abbrev
 end
 
 function osml10n.street_abbrev_all(longname)
   local abbrev = longname
-  for _,v in pairs(abbrev_func_all) do
-    abbrev = v(abbrev)
-  end
+  abbrev = osml10n.street_abbrev_latin(abbrev)
+  abbrev = osml10n.street_abbrev_non_latin(abbrev)
   return abbrev
 end
 
