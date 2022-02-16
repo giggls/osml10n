@@ -107,7 +107,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
   pos = string.find(unacc,unacc_local)
   -- if string contains local_name
   if ( pos ~= nil) then
-    if (rex.match(' ' .. unacc .. ' ','\\Q' .. unacc_local .. '\\E') ~= nil) then
+    if (rex.match(' ' .. unacc .. ' ', '[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_local .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
       -- try to create a better string for combined name than plain name
       -- do these complex checks only in case unaccented name != unaccented local_name
       if (string.len(unacc) == string.len(unacc_local)) then
@@ -164,6 +164,14 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
               end
             end
           end
+        end
+        if not found then
+          if is_street then
+            resarr[idxl] = sabbrev.street_abbrev_all(tags[local_name])
+          else
+            resarr[idxl] = tags[local_name]
+          end
+        return(resarr)
         end
       end
     end
