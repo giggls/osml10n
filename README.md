@@ -48,7 +48,7 @@ open an issue here.
 ## Installation of the transcription-daemon
 
 ```
-apt install libsqlite3-mod-spatialite python3-icu python3-psycopg2
+apt install python3-icu python3-shapely
 
 pip3 install pykakasi
 pip3 install tltk
