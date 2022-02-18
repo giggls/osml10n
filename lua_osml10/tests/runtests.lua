@@ -233,6 +233,10 @@ checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ဘ�
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ဘုရားကိုင်လမ်း|Pha Yar Kai Rd.‬",
 {["name"]= "ဘုရားကိုင်လမ်း", ["highway"]= "secondary", ["name:en"]= "Pha Yar Kai Road", ["name:my"]= "ဘုရားကိုင်လမ်း"},true,false,'|')
 
+-- special case here is that name:yue is a substring of name:zh (https://www.openstreetmap.org/way/35973184)
+checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪鳳凰徑第3段|Lantau Trail Section 3‬",
+{["name"]= "鳳凰徑第3段 Lantau Trail Section 3", ["name:en"]= "Lantau Trail Section 3", ["name:yue"]="鳳凰徑", ["name:zh"]="鳳凰徑第3段"},true,false,'|')
+
 print(passed .. " tests passed, " .. failed .. " tests failed.")
 
 if (failed > 0) then os.exit(1) else os.exit(0) end
