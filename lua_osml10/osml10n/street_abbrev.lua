@@ -2,8 +2,11 @@ local osml10n = {}
 
 local rex = require "rex_pcre"
 
+-- all available abbrev functions
+local abbrev_func_all = {}
+
 -- replaces some common parts of German street names with their abbreviation
-function osml10n.street_abbrev_de(longname)
+abbrev_func_all.de = function(longname)
   local abbrev = longname
   local pos = string.find(abbrev,'traße')
   if ((pos ~= nil) and (pos >2)) then
@@ -21,7 +24,7 @@ function osml10n.street_abbrev_de(longname)
     abbrev = string.gsub(abbrev,"Gasse%s", "G. ")
     abbrev = string.gsub(abbrev,"Gasse$", "G.")
     abbrev = string.gsub(abbrev,"gasse%s", "g. ")
-    abbrev = string.gsub(abbrev,"gasse$", "g.")    
+    abbrev = string.gsub(abbrev,"gasse$", "g.")
   end
   pos = string.find(abbrev,'latz')
   if ((pos ~= nil) and (pos >2)) then
@@ -54,7 +57,7 @@ function osml10n.street_abbrev_de(longname)
 end
 
 -- replaces some common parts of English street names with their abbreviation
-function osml10n.street_abbrev_en(longname)
+abbrev_func_all.en = function(longname)
   local abbrev = longname
   -- Avenue is a special case because we must try to exclude french names
   local pos = string.find(abbrev,'Avenue')
@@ -69,7 +72,7 @@ function osml10n.street_abbrev_en(longname)
   if ((pos ~= nil) and (pos >1)) then
     abbrev=rex.gsub(abbrev,'(?!^)Boulevard\\b','Blvd.');
   end
-  
+
   match = rex.match(abbrev, '(Crescent|Court|Drive|Lane|Place|Road|Street|Square|Expressway|Freeway)\\b')
   if (match ~= nil) then
     if (match == 'Crescent') then abbrev = string.gsub(abbrev,'Crescent','Cres.') end
@@ -80,17 +83,17 @@ function osml10n.street_abbrev_en(longname)
     if (match == 'Road') then abbrev = string.gsub(abbrev,'Road','Rd.') end
     if (match == 'Street') then abbrev = string.gsub(abbrev,'Street','St.') end
     if (match == 'Square') then abbrev = string.gsub(abbrev,'Square','Sq.') end
-    
+
     if (match == 'Expressway') then abbrev = string.gsub(abbrev,'Expressway','Expy') end
     if (match == 'Freeway') then abbrev = string.gsub(abbrev,'Freeway','Fwy') end
   end
-  
+
   -- Parkway Drive should be Parkway Dr. not "Pkwy Dr."
   pos = string.find(abbrev,'Parkway')
   if ((pos ~= nil) and (pos >1)) then
     abbrev = rex.gsub(abbrev,"Parkway\\b", "Pkwy")
   end
-  
+
   match = rex.match(abbrev, '(North|South|West|East|Northwest|Northeast|Southwest|Southeast)\\b')
   if (match ~= nil) then
     if (match == 'North') then abbrev = string.gsub(abbrev,'North','N') end
@@ -102,12 +105,12 @@ function osml10n.street_abbrev_en(longname)
     if (match == 'Southwest') then abbrev = string.gsub(abbrev,'Southwest','SW') end
     if (match == 'Southeast') then abbrev = string.gsub(abbrev,'Southeast','SE') end
   end
-  
+
   return abbrev
 end
 
 -- replaces some common parts of French street names with their abbreviation
-function osml10n.street_abbrev_fr(longname)
+abbrev_func_all.fr = function(longname)
   local abbrev = longname
   -- These are also French names and Avenue is not at the beginning of the Name
   -- those apear in French speaking parts of canada
@@ -116,8 +119,8 @@ function osml10n.street_abbrev_fr(longname)
   if ((pos ~= nil) and (pos >1)) then
     abbrev = rex.gsub(abbrev, '^1([eè]?r?)e Avenue\\b','1re Av.')
     abbrev = rex.gsub(abbrev, '^([0-9]+)e Avenue\\b','%1e Av.')
-  end 
-  
+  end
+
   match = rex.match(abbrev, '^(Avenue|Boulevard|Chemin|Esplanade|Impasse|Passage|Promenade|Route|Ruelle|Sentier)\\b')
   if (match ~= nil) then
     if (match == 'Avenue') then abbrev = string.gsub(abbrev,'Avenue','Av.') end
@@ -131,24 +134,12 @@ function osml10n.street_abbrev_fr(longname)
     if (match == 'Ruelle') then abbrev = string.gsub(abbrev,'Ruelle','Rle') end
     if (match == 'Sentier') then abbrev = string.gsub(abbrev,'Sentier','Sent.') end
   end
-  
+
   return abbrev
 end
 
--- replaces some common parts of Spanish street names with their abbreviation
--- currently just a stub :(
-function osml10n.street_abbrev_es(longname)
-  return longname
-end
-
--- replaces some common parts of Portuguese street names with their abbreviation
--- currently just a stub :(
-function osml10n.street_abbrev_pt(longname)
-  return longname
-end
-
 -- replaces some common parts of Russion street names with their abbreviation
-function osml10n.street_abbrev_ru(longname)
+abbrev_func_all.ru = function(longname)
   local abbrev = longname
   abbrev = string.gsub(abbrev,'переулок', 'пер.')
   abbrev = string.gsub(abbrev,'тупик', 'туп.')
@@ -162,7 +153,7 @@ function osml10n.street_abbrev_ru(longname)
 end
 
 -- replaces some common parts of Ukrainian street names with their abbreviation
-function osml10n.street_abbrev_uk(longname)
+abbrev_func_all.uk = function(longname)
   local abbrev = longname
   abbrev = string.gsub(abbrev,"провулок", "пров.")
   abbrev = string.gsub(abbrev,'тупик', 'туп.')
@@ -175,29 +166,8 @@ function osml10n.street_abbrev_uk(longname)
   return abbrev
 end
 
--- definition of latin abbrev functions
-local abbrev_func_latin = {
-  de = osml10n.street_abbrev_de,
-  en = osml10n.street_abbrev_en,
-  fr = osml10n.street_abbrev_fr,
-  es = osml10n.street_abbrev_es,
-  pt = osml10n.street_abbrev_pt
-}
-
--- definition of non latin abbrev functions
-local abbrev_func_non_latin = {
-  ru = osml10n.street_abbrev_ru,
-  uk = osml10n.street_abbrev_uk
-}
-
--- all available abbrev functions
-local abbrev_func_all = {}
--- this basically just means abbrev_func_all = abbrev_func_latin + abbrev_func_non_latin
-for k,v in pairs(abbrev_func_latin) do abbrev_func_all[k] = v end
-for k,v in pairs(abbrev_func_non_latin) do abbrev_func_all[k] = v end
-
--- use table with function pointers instead of string-exec
-function osml10n.street_abbrev(longname,langcode)
+-- do street name abbreviation for specific language
+function osml10n.street_abbrev(longname, langcode)
   if (abbrev_func_all[langcode] == nil) then
     return(longname)
   end
@@ -206,18 +176,18 @@ end
 
 function osml10n.street_abbrev_latin(longname)
   local abbrev = longname
-  abbrev = osml10n.street_abbrev_en(abbrev)
-  abbrev = osml10n.street_abbrev_de(abbrev)
-  abbrev = osml10n.street_abbrev_fr(abbrev)
-  abbrev = osml10n.street_abbrev_es(abbrev)
-  abbrev = osml10n.street_abbrev_pt(abbrev)
+  abbrev = abbrev_func_all.en(abbrev)
+  abbrev = abbrev_func_all.de(abbrev)
+  abbrev = abbrev_func_all.fr(abbrev)
+--  abbrev = abbrev_func_all.es(abbrev)
+--  abbrev = abbrev_func_all.pt(abbrev)
   return abbrev
 end
 
 function osml10n.street_abbrev_non_latin(longname)
   local abbrev = longname
-  abbrev = osml10n.street_abbrev_ru(abbrev)
-  abbrev = osml10n.street_abbrev_uk(abbrev)
+  abbrev = abbrev_func_all.ru(abbrev)
+  abbrev = abbrev_func_all.uk(abbrev)
   return abbrev
 end
 
