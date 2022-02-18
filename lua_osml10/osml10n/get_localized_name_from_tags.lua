@@ -118,7 +118,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
         end
         return(resarr)
       end
-      -- verbatim copy from pl/pgsql probably not needed
+      -- verbatim copy from old pl/pgsql code probably not needed
       if (tags == nil) then
         print("tags is nil ?!")
         nobrackets=true
@@ -127,7 +127,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
           if string.match(tag,'^name:.+$') then
             unacc_tag = unaccent.unaccent(v)
             if (unacc_tag ~= unacc_local) then
-              if (rex.match(' ' .. unacc .. ' ','\\Q' .. unacc_tag .. '\\E') ~= nil) then
+              if (rex.match(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
                 print('using ' .. tag .. ' (' .. v .. ') as second name');
                 -- we found a 'second' name
                 -- While a request might want to prefer printing this
