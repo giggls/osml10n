@@ -124,7 +124,9 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
         nobrackets=true
       else
         for tag,v in pairs(tags) do
-          if string.match(tag,'^name:.+$') then
+          -- ignore all the name:* tags here which are not languages here
+          -- e.g. something like name:left name:right or romanized versions of the name
+          if string.match(tag,'^name:[a-z][a-z][a-z]?$') then
             unacc_tag = unaccent.unaccent(v)
             if (unacc_tag ~= unacc_local) then
               if (rex.match(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
