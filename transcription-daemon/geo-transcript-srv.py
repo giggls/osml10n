@@ -1,15 +1,16 @@
 #!/usr/bin/python3
 
+import argparse
 import asyncio
-import struct
-import sys
-
+import contextlib
 import json
+import os
 import pathlib
 import shapely.geometry
 import shapely.prepared
+import struct
+import sys
 
-import argparse
 # as imports are very slow parse arguments first
 parser = argparse.ArgumentParser(description='Server for transcription of names based on geolocation')
 parser.add_argument("-b", "--bindaddr", type=str, default="localhost", help="local bind address")
@@ -28,10 +29,6 @@ sys.stdout.write("Loading osml10n transcription server: ")
 sys.stdout.flush()
 vout("\n")
 
-from contextlib import contextmanager,redirect_stderr,redirect_stdout
-from os import devnull
-
-import os
 import icu
 import unicodedata
 # Kanji in JP
@@ -39,8 +36,8 @@ import pykakasi
 # thai language in TH
 import tltk
 # Cantonese transcription
-with open(devnull, 'w') as fnull:
-  with redirect_stderr(fnull) as err, redirect_stdout(fnull) as out:
+with open(os.devnull, 'w') as fnull:
+  with contextlib.redirect_stderr(fnull) as err, contextlib.redirect_stdout(fnull) as out:
     import pinyin_jyutping_sentence
 
 def split_by_alphabet(str):
@@ -257,5 +254,8 @@ async def main():
 
 if __name__ == "__main__":
   sys.stdout.write("ready.\n")
-  asyncio.run(main())
+  try:
+    asyncio.run(main())
+  except KeyboardInterrupt:
+    print('Stopping server\n')
 
