@@ -229,7 +229,7 @@ end
 --
 -- While the former returns two names in most cases the latter just returns one!
 
-function osml10n.get_names_from_tags(tags, localized_name_second, is_street, targetlang, place)
+function osml10n.get_names_from_tags(id, tags, localized_name_second, is_street, targetlang, place)
   local resarr = {"",""}
   -- default is English now not German
   if (targetlang == nil) then targetlang = "en" end
@@ -277,9 +277,9 @@ function osml10n.get_names_from_tags(tags, localized_name_second, is_street, tar
       end
     end
     if is_street then
-      tags['name:Latn']=transcript.geo_transcript(sabbrev.street_abbrev_non_latin(tags['name']),place)
+      tags['name:Latn']=transcript.geo_transcript(id,sabbrev.street_abbrev_non_latin(tags['name']),place)
     else
-      tags['name:Latn']=transcript.geo_transcript(tags['name'],place)
+      tags['name:Latn']=transcript.geo_transcript(id,tags['name'],place)
     end
       return osml10n.gen_combined_names('name:Latn',tags,localized_name_second,is_street,false,true);  
   else
@@ -287,7 +287,7 @@ function osml10n.get_names_from_tags(tags, localized_name_second, is_street, tar
   end
 end
 
-function osml10n.get_localized_name_from_tags(tags, targetlang, place)
+function osml10n.get_localized_name_from_tags(id, tags, targetlang, place)
   local resarr = {"",""}
   -- default is English now not German
   if (targetlang == nil) then targetlang = "en" end
@@ -331,7 +331,7 @@ function osml10n.get_localized_name_from_tags(tags, targetlang, place)
       end
     end
     -- do transliteration as a last resort
-    return transcript.geo_transcript(tags['name'],place)
+    return transcript.geo_transcript(id,tags['name'],place)
   else
     return ''
   end
@@ -339,24 +339,24 @@ end
 
 -- In lua targetlang and place are if not given in call,
 -- so theses are kind of optional parameters
-function osml10n.get_streetname_from_tags(tags, localized_name_second, show_brackets, separator, targetlang, place)
+function osml10n.get_streetname_from_tags(id, tags, localized_name_second, show_brackets, separator, targetlang, place)
   local names = {}
   if (show_brackets == nil) then show_brackets = false end
   if (separator == nil) then separator = ' - ' end
   
-  names = osml10n.get_names_from_tags(tags, localized_name_second, true, targetlang, place)
+  names = osml10n.get_names_from_tags(id, tags, localized_name_second, true, targetlang, place)
   
   return(osml10n.format_combined_name(names,show_brackets,separator))
 end
 
 -- In lua targetlang and place are if not given in call,
 -- so theses are kind of optional parameters
-function osml10n.get_placename_from_tags(tags, localized_name_second, show_brackets, separator, targetlang, place)
+function osml10n.get_placename_from_tags(id, tags, localized_name_second, show_brackets, separator, targetlang, place)
   local names = {}
   if (show_brackets == nil) then show_brackets = false end
   if (separator == nil) then separator = '\n' end
   
-  names = osml10n.get_names_from_tags(tags, localized_name_second, false, targetlang, place)
+  names = osml10n.get_names_from_tags(id, tags, localized_name_second, false, targetlang, place)
 
   return(osml10n.format_combined_name(names,show_brackets,separator))
 end

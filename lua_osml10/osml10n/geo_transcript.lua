@@ -1,11 +1,13 @@
 local osml10n = {}
 
-local server_url = "http://localhost:8080"
+local server_host = '127.0.0.1'
+local server_port = 8033
 
-local http = require"socket.http"
-local ltn12 = require"ltn12"
+local socket = require('socket')
+local sock = socket.connect(server_host, server_port)
+sock:setoption('tcp-nodelay', true)
 
-function osml10n.geo_transcript(name,bbox)
+function osml10n.geo_transcript(id,name,bbox)
   local lon,lat,reqbody
   local bx = {}
   if (bbox == nil) then
@@ -19,24 +21,24 @@ function osml10n.geo_transcript(name,bbox)
     end
       lon = (bx[1]+bx[3])/2.0
       lat = (bx[2]+bx[4])/2.0
-    reqbody = lon .. "/" .. lat .. "/" .. name
+    reqbody = id .. "/" .. lon .. "/" .. lat .. "/" .. name
   end
-  local respbody = {} -- for the response body
-  local result, respcode, respheaders, respstatus = http.request {
-    method = "POST",
-    url = server_url,
-    source = ltn12.source.string(reqbody),
-    headers = {
-      ["content-type"] = "text/plain",
-      ["content-length"] = tostring(#reqbody)
-    },
-    sink = ltn12.sink.table(respbody)
-  }
-  if (result ~= 1) then
-    print("http error: " .. respcode)
-    return("transcription error")
+
+  sock:send(string.pack('s4', reqbody))
+  lendata, msg = sock:receive(4)
+  if lendata == nil then
+    error(msg)
   end
-  return table.concat(respbody)
+  length = string.unpack('I4', lendata)
+  if (length > 0) then
+      local response, msg = sock:receive(length)
+      if response == nil then
+        error(msg)
+      end
+      return response
+  end
+  return ''
+
 end
 
 return osml10n

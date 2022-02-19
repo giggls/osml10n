@@ -18,19 +18,30 @@
 */
 
 
-CREATE or REPLACE FUNCTION osml10n_cc_translit(name text, country text DEFAULT 'aq', host text DEFAULT 'localhost', port text DEFAULT '8080') RETURNS TEXT AS $$
+CREATE or REPLACE FUNCTION osml10n_cc_translit(name text, country text DEFAULT 'aq', host text DEFAULT 'localhost', port int DEFAULT 8033) RETURNS TEXT AS $$
   import plpy
-  from urllib.parse import urlencode
-  from urllib.request import Request, urlopen
-  
-  url = 'http://' + host + ':' + port
-  post_data = country + '/' + name;
+  import socket
+  import struct
+
   try:
-    request = Request(url, post_data.encode())
-    tname = urlopen(request).read().decode()
-  except:
-    plpy.warning("unable to connect to daemon returning non transcripted name")
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((host, port))
+    data = ('X/' + country + '/' + name).encode('utf-8');
+
+    length = len(data)
+    sock.sendall(struct.pack('I', length) + data)
+
+    lendata = sock.recv(4)
+    if len(lendata) == 0:
+        plpy.warning("error talking to daemon returning non transcripted name")
+        return(name)
+
+    length = struct.unpack('I', lendata)
+    reply = sock.recv(length[0]).decode('utf-8')
+
+  except BaseException as err:
+    plpy.warning(f"unable to connect to daemon returning non transcripted name: {err}")
     return(name)
 
-  return(tname)
+  return(reply)
 $$ LANGUAGE plpython3u STABLE;
