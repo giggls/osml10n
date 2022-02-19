@@ -4,15 +4,18 @@ import asyncio
 import struct
 import sys
 
+import json
+import pathlib
+import shapely.geometry
+import shapely.prepared
+
 import argparse
 # as imports are very slow parse arguments first
 parser = argparse.ArgumentParser(description='Server for transcription of names based on geolocation')
 parser.add_argument("-b", "--bindaddr", type=str, default="localhost", help="local bind address")
 parser.add_argument("-p", "--port", default=8033, help="port to listen at")
 parser.add_argument("-v", "--verbose", action='store_true', help="print verbose output")
-group = parser.add_mutually_exclusive_group()
-group.add_argument('-d', '--dbcon', help='PostgreSQL (psycopg2) connection string')
-group.add_argument('-s', '--sqlitefile', default='country_osm_grid.db', help='SQLITE file')
+parser.add_argument('-g', '--geomdir', required=True, help='Directory with geometries')
 
 args = parser.parse_args()
 
@@ -141,95 +144,43 @@ class transcriptor:
 
     return(unicodedata.normalize('NFC', self.icutr(unistr)))
 
-# convert lon/lat to countrycode via PostgreSQL
-class Coord2Country_psql:
-  def __init__(self):
-      import psycopg2
-      self.sql = """
-      SELECT country_code from country_osm_grid
-      WHERE st_contains(geometry, ST_GeomFromText('POINT(%s %s)', 4326))
-      ORDER BY area LIMIT 1;
-      """
-      try:
-        self.conn = psycopg2.connect(args.dbcon)
-      except:
-        sys.stderr.write("Unable to connect to database using %s " % args.dbcon)
-        sys.stderr.write("falling back to countrycode-only mode\n")
-        self.ready = False
-        return
-      self.cur = self.conn.cursor()
-      self.ready = True
-  def getCountry(self,lon,lat):
-    try:
-      self.cur.execute(self.sql % (lon,lat))
-      rows = self.cur.fetchall()
-      if len(rows) == 0:
-        return('')
-      else:
-        return(rows[0][0])
-    except Exception as e:
-      sys.stderr.write("Database query error:\n")
-      sys.stderr.write(str(e))
-      sys.exit(1)
-
-# convert lon/lat to countrycode via SQLITE
-class Coord2Country_sqlite:
-  def __init__(self):
-    # check if sqlite file is available
-    fn = os.path.realpath(args.sqlitefile)
-    if not os.path.isfile(fn):
-      sys.stderr.write("Unable to open SQLITE file %s, " % args.sqlitefile)
-      sys.stderr.write("falling back to countrycode-only mode\n")
-      self.ready = False
-      return
-    import sqlite3
-    self.sql = """
-    SELECT country_code
-    FROM country_osm_grid
-    WHERE st_contains(geometry, ST_GeomFromText('POINT(%s %s)', 4326))
-    AND ROWID IN (
-      SELECT ROWID
-      FROM SpatialIndex
-      WHERE f_table_name = 'country_osm_grid'
-      AND search_frame = ST_GeomFromText('POINT(%s %s)', 4326)
-    ) ORDER BY area LIMIT 1;
-    """
-    self.conn = sqlite3.connect(fn)
-    self.conn.enable_load_extension(True)
-    self.conn.load_extension("mod_spatialite")
-    self.cur = self.conn.cursor()
-    self.ready = True
-
-  def getCountry(self,lon,lat):
-    self.cur.execute(self.sql % (lon,lat,lon,lat))
-    rows = self.cur.fetchall()
-    if len(rows) == 0:
-      return('')
-    else:
-      return(rows[0][0])
-
-# convert lon/lat to countrycode via PostgreSQL
 class Coord2Country:
-  def __init__(self):
-    if args.dbcon is not None:
-      vout("Using PostgreSQL for country_osm_grid!\n")
-      self.co2c = Coord2Country_psql()
-    else:
-      vout("Using SQLITE for country_osm_grid!\n")
-      self.co2c = Coord2Country_sqlite()
-    self.ready = self.co2c.ready
-  def getCountry(self,lon,lat):
-    # if no coordinates are given
-    if (lat == "") and (lon == ""):
-      return('')
-    country = self.co2c.getCountry(lon,lat)
-    if (country == ""):
-      vout("country for %s/%s is unknown\n" % (lon,lat))
-    else:
-      vout("country for %s/%s is %s\n" % (lon,lat,country))
-    return(country)
+  features = []
 
-co2c = Coord2Country()
+  # Read all GeoJSON files in the specified directory and return as an array
+  # of GeoJSON features.
+  @staticmethod
+  def read_boundaries(dirname):
+    features = []
+    for path in pathlib.Path(dirname).iterdir():
+      if path.is_file() and path.suffix == '.geojson':
+        with open(path) as f:
+          features.extend(json.load(f)["features"])
+    return features
+
+  def __init__(self, dirname):
+    features = self.read_boundaries(dirname)
+    boundaries = []
+    for feature in features:
+      geom = shapely.geometry.shape(feature["geometry"])
+      cc = feature["properties"]["cc"]
+      boundaries.append(cc)
+      self.features.append([shapely.prepared.prep(geom), cc])
+    vout(f"Found boundaries: {boundaries}")
+
+  def getCountry(self,lon,lat):
+    if lon == '' or lat == '':
+      return ''
+    p = shapely.geometry.Point(float(lon), float(lat))
+    for f in self.features:
+      if f[0].contains(p):
+        country = f[1]
+        vout("country for %s/%s is %s\n" % (lon,lat,country))
+        return f[1]
+    vout("country for %s/%s is unknown\n" % (lon,lat))
+    return ''
+
+co2c = Coord2Country(args.geomdir)
 tc = transcriptor()
 
 # Read a request from the socket. First read 4 bytes containing the length
@@ -273,16 +224,13 @@ async def handle_connection(reader, writer):
       else:
         (id,lon,lat,name) = qs
         # Do check for country only if string contains Thai or CJK characters
-        if co2c.ready:
-          if contains_cjk(name):
-            cc = co2c.getCountry(lon,lat)
-          else:
-            if contains_thai(name):
-              cc = 'th'
-            else:
-              cc = ''
+        if contains_cjk(name):
+          cc = co2c.getCountry(lon,lat)
         else:
-          cc = ''
+          if contains_thai(name):
+            cc = 'th'
+          else:
+            cc = ''
 
       try:
         if name != '':
