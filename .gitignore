@@ -2,3 +2,8 @@
 *.buildinfo
 *.changes
 *.xz
+debian/osml10n*
+debian/debhelper-build-stamp
+debian/.debhelper/
+debian/*.substvars
+debian/files

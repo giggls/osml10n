@@ -15,6 +15,7 @@ import sys
 parser = argparse.ArgumentParser(description='Server for transcription of names based on geolocation')
 parser.add_argument("-b", "--bindaddr", type=str, default="localhost", help="local bind address")
 parser.add_argument("-p", "--port", default=8033, help="port to listen at")
+parser.add_argument('-s', '--sdnotify',  action='store_true', help='Signal systemd when daemon is ready to serve')
 parser.add_argument("-v", "--verbose", action='store_true', help="print verbose output")
 parser.add_argument('-g', '--geomdir', required=True, help='Directory with geometries')
 
@@ -31,14 +32,22 @@ vout("\n")
 
 import icu
 import unicodedata
-# Kanji in JP
-import pykakasi
-# thai language in TH
-import tltk
-# Cantonese transcription
-with open(os.devnull, 'w') as fnull:
-  with contextlib.redirect_stderr(fnull) as err, contextlib.redirect_stdout(fnull) as out:
-    import pinyin_jyutping_sentence
+
+try:
+  # Kanji in JP
+  import pykakasi
+
+  # thai language in TH
+  import tltk
+
+  # Cantonese transcription
+  with open(os.devnull, 'w') as fnull:
+    with contextlib.redirect_stderr(fnull) as err, contextlib.redirect_stdout(fnull) as out:
+      import pinyin_jyutping_sentence
+except:
+  sys.stderr.write("\nERROR: unable to load required python modules, please install them as follows:\n")
+  sys.stderr.write("pip install pykakasi\npip install tltk\npip install pinyin_jyutping_sentence\n\n")
+  sys.exit(1)
 
 def split_by_alphabet(str):
     strlist=[]
@@ -254,6 +263,9 @@ async def main():
 
 if __name__ == "__main__":
   sys.stdout.write("ready.\n")
+  if args.sdnotify:
+    import sdnotify
+    sdnotify.SystemdNotifier().notify("READY=1")
   try:
     asyncio.run(main())
   except KeyboardInterrupt:

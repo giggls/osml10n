@@ -8,9 +8,8 @@ Homepage: https://github.com/giggls/osml10n
 
 Package: osml10n
 Architecture: all
-Depends: lua5.3, lua-unaccent, lua-socket
+Depends: lua5.3, lua-unaccent, lua-socket, python3, python3-sdnotify, python3-shapely
 Suggests: osm2pgsql
 Description: l10n functions for Openstreetmap tags
  Localisation functions for Openstreetmap tags to be used in database import
  with osm2pgsql
-

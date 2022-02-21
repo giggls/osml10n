@@ -44,19 +44,6 @@ Cantonese transcription support.
 If you have an idea for an even better approach than this one feel free to
 open an issue here.
 
-
-## Installation of the transcription-daemon
-
-```
-apt install python3-icu python3-shapely
-
-pip3 install pykakasi
-pip3 install tltk
-pip3 install pinyin_jyutping_sentence
-```
-
-From Debian package or pip3:
-
 ## Tests
 
 ### Japan
@@ -107,15 +94,24 @@ Install prerequisites:
 
 ```
 apt install libunac1-dev luarocks
+luarocks install lrexlib-pcre
 ```
 
-On **Debian/Ubuntu** just call make deb inside ``lua_osml10`` and ``lua_unac``
+## Installation of the transcription-daemon
+
+Install prerequisites:
+
+```
+apt install python3-icu python3-shapely
+
+pip install pykakasi
+pip install tltk
+pip install pinyin_jyutping_sentence
+```
+
+On **Debian/Ubuntu** just call make deb inside base and ``lua_unac``
 directories. This will give you two Debian packages which can be installed
 on the system.
-
-The code will also need the Lua binding for pcre which unfortunately does
-not seem to be available as a Debian package.  Thus use ``luarocks install
-lrexlib-pcre`` instead.
 
 To test if your installation is working as expected call ``make
 test`` inside the ``lua_osml10`` directory.

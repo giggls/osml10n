@@ -9,6 +9,17 @@ import socket
 import struct
 import sys
 
+def die_usage():
+    sys.stdout.write("uasge: %s ID/CC/WORDS|ID/LON/LAT/WORDS\n" % sys.argv[0])
+    sys.exit(1)
+
+if (len(sys.argv) != 2):
+    die_usage()
+
+arglen =len(sys.argv[1].split('/'))
+if (arglen < 2) or (arglen > 3):
+    die_usage()
+
 sock = socket.create_connection(('localhost', 8033))
 
 data = sys.argv[1].encode('utf-8')
