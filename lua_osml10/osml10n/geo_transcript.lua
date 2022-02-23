@@ -5,6 +5,12 @@ local server_port = 8033
 
 local socket = require('socket')
 local sock = socket.connect(server_host, server_port)
+
+if not sock then
+    error("Can not connect to server " .. server_host .. ":" .. server_port ..
+          ". Is geo-transcript-srv.py running?")
+end
+
 sock:setoption('tcp-nodelay', true)
 
 function osml10n.geo_transcript(id,name,bbox)
