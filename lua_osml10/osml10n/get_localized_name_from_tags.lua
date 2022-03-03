@@ -112,7 +112,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
   end
   unacc_local = unaccent.unaccent(tags[local_name])
   found = false;
-  pos = string.find(unacc,unacc_local)
+  pos = string.find(unacc,unacc_local:gsub("%W", "%%%1"))
   -- if string contains local_name
   if ( pos ~= nil) then
     if (rex.match(' ' .. unacc .. ' ', '[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_local .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
@@ -186,7 +186,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
       end
     end
   end
-  
+  print("pos=nil")
   if nobrackets then
     if is_street then
       resarr[idxn] = sabbrev.street_abbrev_all(tags[name])
