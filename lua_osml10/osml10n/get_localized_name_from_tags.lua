@@ -6,8 +6,17 @@ local helpers = require "osml10n.helper_functions"
 local transcript = require "osml10n.geo_transcript"
 local rex = require "rex_pcre"
 
+-- set to true to enable debug output of langage selection state machine 
+local debugoutput = false
+
 -- 5 most commonly spoken languages using latin script (hopefully)
 local latin_langs = {"en","fr","es","pt","de"}
+
+function dbgprint(msg)
+  if debugoutput then
+    print(msg)
+  end
+end
 
 -- get country code from tag or nil in case of no country-code
 function langcode_code_from_tag(tag)
@@ -19,7 +28,6 @@ function langcode_code_from_tag(tag)
     return langcode
   end
 end
-
 
 -- helper function "osml10n.format_combined_name"
 -- Format an array of two strings into a formated string which can be rendered on the map
@@ -120,7 +128,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
       end
       -- verbatim copy from old pl/pgsql code probably not needed
       if (tags == nil) then
-        print("tags is nil ?!")
+        dbgprint("tags is nil ?!")
         nobrackets=true
       else
         for tag,v in pairs(tags) do
@@ -130,7 +138,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
             unacc_tag = unaccent.unaccent(v)
             if (unacc_tag ~= unacc_local) then
               if (rex.match(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
-                print('using ' .. tag .. ' (' .. v .. ') as second name');
+                dbgprint('using ' .. tag .. ' (' .. v .. ') as second name');
                 -- we found a 'second' name
                 -- While a request might want to prefer printing this
                 -- second name first anyway, to prefer on the ground
@@ -152,7 +160,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
                 -- strict option to disable this behaviour.
                 if (pos == 1) then
                   if (rex.match(string.sub(unacc,1,string.len(unacc_local)+1),'[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
-                    print("swapping primary/second name")
+                    dbgprint("swapping primary/second name")
                     idxl = 1;
                     idxn = 2;
                   end
@@ -179,7 +187,6 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
     end
   end
   
-  -- print("nobrackets: ", nobrackets)
   if nobrackets then
     if is_street then
       resarr[idxn] = sabbrev.street_abbrev_all(tags[name])
@@ -261,7 +268,7 @@ function osml10n.get_names_from_tags(id, tags, localized_name_second, is_street,
       if (lang ~= targetlang) then
         target_tag = 'name:' .. lang
         if (tags[target_tag] ~= nil) then
-          print("found roman language tag " .. lang)
+          dbgprint("found roman language tag " .. lang)
           return osml10n.gen_combined_names(target_tag,tags,localized_name_second,is_street,true,true);
         end
       end
@@ -272,7 +279,7 @@ function osml10n.get_names_from_tags(id, tags, localized_name_second, is_street,
     -- having more than one of them does not make sense
     for tag,_ in pairs(tags) do
       if (string.match(tag,'^name:.+_rm$') or string.match(tag,'^name:.+-Latn$')) then
-        print( 'found romanization name tag ' .. tag)
+        dbgprint( 'found romanization name tag ' .. tag)
         return osml10n.gen_combined_names(tag,tags,localized_name_second,is_street,true,true);
       end
     end
@@ -315,7 +322,7 @@ function osml10n.get_localized_name_from_tags(id, tags, targetlang, place)
       if (lang ~= targetlang) then
         target_tag = 'name:' .. lang
         if (tags[target_tag] ~= nil) then
-          print("found roman language tag " .. lang)
+          dbgprint("found roman language tag " .. lang)
           return tags[target_tag]
         end
       end
@@ -326,7 +333,7 @@ function osml10n.get_localized_name_from_tags(id, tags, targetlang, place)
     -- having more than one of them does not make sense
     for tag,_ in pairs(tags) do
       if (string.match(tag,'^name:.+_rm$') or string.match(tag,'^name:.+-Latn$')) then
-        print( 'found romanization name tag ' .. tag)
+        dbgprint( 'found romanization name tag ' .. tag)
         return tags[tag]
       end
     end
