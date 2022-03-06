@@ -2,7 +2,7 @@ local osml10n = {}
 
 local function import(submodule)
   for k,v in pairs(require(submodule)) do
-    assert(osml10n[k] == nil, "oops dopplet gemoppelt")
+    assert(osml10n[k] == nil, "ERROR: tried to double load submodule")
     osml10n[k] = v
   end
 end

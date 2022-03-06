@@ -237,6 +237,10 @@ checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ဘ�
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪鳳凰徑第3段|Lantau Trail Section 3‬",'',
 {["name"]= "鳳凰徑第3段 Lantau Trail Section 3", ["name:en"]= "Lantau Trail Section 3", ["name:yue"]="鳳凰徑", ["name:zh"]="鳳凰徑第3段"},true,'|')
 
+-- name tag which contains three names
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Bouira|البويرة|ⵝⵓⵠⵉⵔⴻⵜ‬",'',
+{ ["name"] = "Bouira البويرة ⵝⵓⵠⵉⵔⴻⵜ", ["name:de"] = "Bouira",["name:ar"] = "البويرة",["name:ber"] = "ⵝⵓⵠⵉⵔⴻⵜ" },false, '|','de')
+
 print(passed .. " tests passed, " .. failed .. " tests failed.")
 
 if (failed > 0) then os.exit(1) else os.exit(0) end
