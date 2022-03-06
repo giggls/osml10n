@@ -31,16 +31,12 @@ end
 
 -- helper function "osml10n.format_combined_name"
 -- Format an array of two strings into a formated string which can be rendered on the map
-function osml10n.format_combined_name(names, show_brackets, separator)
+function osml10n.format_combined_name(names, separator)
   if (names[1] == '') then return names[2] end
   if (names[2] == '') then return names[1] end
   
   -- explicitely mark the whole string as LTR
-  if (show_brackets) then
-    return '‪' .. names[1] .. separator .. '(' .. names[2] .. ')' .. '‬'
-  else
-    return '‪' ..  names[1] ..  separator ..  names[2] ..  '‬'
-   end
+  return '‪' ..  names[1] ..  separator ..  names[2] ..  '‬'
 end
 
 -- helper function "osml10n.gen_combined_names"
@@ -56,7 +52,7 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
 
   local resarr = {"",""}
   local unacc, unacc_local, unacc_tag
-  local found, pos, nobrackets
+  local found, pos
   local idxl, idxn
   local n, ln
   local langcode
@@ -83,7 +79,6 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
     end
     return resarr
   end
-  nobrackets=false
   -- Now we need to do some heuristic to check if the generation of a
   -- combined name is a good idea.
   
@@ -126,96 +121,80 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_second, is_
         end
         return(resarr)
       end
-      -- verbatim copy from old pl/pgsql code probably not needed
-      if (tags == nil) then
-        dbgprint("tags is nil ?!")
-        nobrackets=true
-      else
-        for tag,v in pairs(tags) do
-          -- ignore all the name:* tags here which are not languages here
-          -- e.g. something like name:left name:right or romanized versions of the name
-          if string.match(tag,'^name:[a-z][a-z][a-z]?$') then
-            unacc_tag = unaccent.unaccent(v)
-            if (unacc_tag ~= unacc_local) then
-              if (rex.match(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
-                dbgprint('using ' .. tag .. ' (' .. v .. ') as second name');
-                -- we found a 'second' name
-                -- While a request might want to prefer printing this
-                -- second name first anyway, to prefer on the ground
-                -- language over l10n we pretend to know better in one 
-                -- special case:
-                   
-                -- if the name in our target language is the first one in
-                -- the generic name tag we will likely also want to print
-                -- it first in l10n output.
-                   
-                -- This will make a lot of sense in bilingual areas where
-                -- mappers usually use the convention of putting the more
-                -- important language first in bilingual generic name tag.
-                   
-                -- So just remove the idxl and idxn assignments below
-                -- if you want to get rid of this fuzzy behaviour!
-                   
-                -- Probably it might be a good idea to add an additional
-                -- strict option to disable this behaviour.
-                if (pos == 1) then
-                  if (rex.match(string.sub(unacc,1,string.len(unacc_local)+1),'[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
-                    dbgprint("swapping primary/second name")
-                    idxl = 1;
-                    idxn = 2;
-                  end
+
+      for tag,v in pairs(tags) do
+        -- ignore all the name:* tags here which are not languages here
+        -- e.g. something like name:left name:right or romanized versions of the name
+        if string.match(tag,'^name:[a-z][a-z][a-z]?$') then
+          unacc_tag = unaccent.unaccent(v)
+          if (unacc_tag ~= unacc_local) then
+            if (rex.match(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
+              dbgprint('using ' .. tag .. ' (' .. v .. ') as second name');
+              -- we found a 'second' name
+              -- While a request might want to prefer printing this
+              -- second name first anyway, to prefer on the ground
+              -- language over l10n we pretend to know better in one 
+              -- special case:
+                 
+              -- if the name in our target language is the first one in
+              -- the generic name tag we will likely also want to print
+              -- it first in l10n output.
+                 
+              -- This will make a lot of sense in bilingual areas where
+              -- mappers usually use the convention of putting the more
+              -- important language first in bilingual generic name tag.
+                 
+              -- So just remove the idxl and idxn assignments below
+              -- if you want to get rid of this fuzzy behaviour!
+                  
+              -- Probably it might be a good idea to add an additional
+              -- strict option to disable this behaviour.
+              if (pos == 1) then
+                if (rex.match(string.sub(unacc,1,string.len(unacc_local)+1),'[\\s\\(\\)\\-,;:/\\[\\]]') ~= nil) then
+                  dbgprint("swapping primary/second name")
+                  idxl = 1;
+                  idxn = 2;
                 end
-                name = tag;
-                nobrackets=false;
-                found=true;
-                break
-              else
-                nobrackets=true; 
               end
+              name = tag;
+              found=true;
+              break
             end
           end
         end
-        if not found then
-          if is_street then
-            resarr[idxl] = sabbrev.street_abbrev_all(tags[local_name])
-          else
-            resarr[idxl] = tags[local_name]
-          end
-        return(resarr)
+      end
+      if not found then
+        if is_street then
+          resarr[idxl] = sabbrev.street_abbrev_all(tags[local_name])
+        else
+          resarr[idxl] = tags[local_name]
         end
+      return(resarr)
       end
     end
   end
-  print("pos=nil")
-  if nobrackets then
-    if is_street then
-      resarr[idxn] = sabbrev.street_abbrev_all(tags[name])
+
+  if is_street then
+    if (langcode ~= nil) then
+      ln=sabbrev.street_abbrev(tags[local_name],langcode);
+    else -- int_name case, we assume that this is in latin script
+      ln=sabbrev.street_abbrev_latin(tags[local_name])
+    end
+    if (string.find(name,':') ~= nil) then
+      n=sabbrev.street_abbrev(tags[name],langcode_code_from_tag(name));
     else
-      resarr[idxn] = tags[local_name]
+      if non_latin then
+        n=sabbrev.street_abbrev_non_latin(tags[name]);
+      else
+        n=sabbrev.street_abbrev_all(tags[name]);
+      end
     end
   else
-    if is_street then
-      if (langcode ~= nil) then
-        ln=sabbrev.street_abbrev(tags[local_name],langcode);
-      else -- int_name case, we assume that this is in latin script
-        ln=sabbrev.street_abbrev_latin(tags[local_name])
-      end
-      if (string.find(name,':') ~= nil) then
-        n=sabbrev.street_abbrev(tags[name],langcode_code_from_tag(name));
-      else
-        if non_latin then
-          n=sabbrev.street_abbrev_non_latin(tags[name]);
-        else
-          n=sabbrev.street_abbrev_all(tags[name]);
-        end
-      end
-    else
-      n=tags[name]
-      ln=tags[local_name]
-    end
-    resarr[idxl] = ln
-    resarr[idxn] = n
+    n=tags[name]
+    ln=tags[local_name]
   end
+  resarr[idxl] = ln
+  resarr[idxn] = n
   return(resarr)
 end
 
@@ -346,26 +325,24 @@ end
 
 -- In lua targetlang and place are if not given in call,
 -- so theses are kind of optional parameters
-function osml10n.get_streetname_from_tags(id, tags, localized_name_second, show_brackets, separator, targetlang, place)
+function osml10n.get_streetname_from_tags(id, tags, localized_name_second, separator, targetlang, place)
   local names = {}
-  if (show_brackets == nil) then show_brackets = false end
   if (separator == nil) then separator = ' - ' end
   
   names = osml10n.get_names_from_tags(id, tags, localized_name_second, true, targetlang, place)
   
-  return(osml10n.format_combined_name(names,show_brackets,separator))
+  return(osml10n.format_combined_name(names,separator))
 end
 
 -- In lua targetlang and place are if not given in call,
 -- so theses are kind of optional parameters
-function osml10n.get_placename_from_tags(id, tags, localized_name_second, show_brackets, separator, targetlang, place)
+function osml10n.get_placename_from_tags(id, tags, localized_name_second, separator, targetlang, place)
   local names = {}
-  if (show_brackets == nil) then show_brackets = false end
   if (separator == nil) then separator = '\n' end
   
   names = osml10n.get_names_from_tags(id, tags, localized_name_second, false, targetlang, place)
 
-  return(osml10n.format_combined_name(names,show_brackets,separator))
+  return(osml10n.format_combined_name(names,separator))
 end
 
 return osml10n

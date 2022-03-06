@@ -161,43 +161,43 @@ checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'',"Москва́
 
 print("")
 
-checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Москва́ - Moskau‬",'',{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },true,false, ' - ','de')
-checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Moskau|Москва́‬",'',{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },false,false, '|','de')
-checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","London",'',{ ["name"] = "London", ["name:de"] = "London", ["name:en"] = "London" },false,false, '|','de')
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Москва́ - Moskau‬",'',{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },true, ' - ','de')
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Moskau|Москва́‬",'',{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },false, '|','de')
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","London",'',{ ["name"] = "London", ["name:de"] = "London", ["name:en"] = "London" },false, '|','de')
 
 -- in lua rewriute default is 'en' for language
-checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Cairo|القاهرة‬",'', { ["name"] = "القاهرة", ["name:de"] = "Kairo", ["int_name"] = "Cairo", ["name:en"] = "Cairo" },false,false, '|')
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Cairo|القاهرة‬",'', { ["name"] = "القاهرة", ["name:de"] = "Kairo", ["int_name"] = "Cairo", ["name:en"] = "Cairo" },false, '|')
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Brüssel|Bruxelles‬",'',
-{ ["name"] ="Bruxelles - Brussel", ["name:de"] = "Brüssel", ["name:en"] = "Brussels" , ["name:xx"] = "Brussel", ["name:af"] = "Brussel",["name:fr"]= "Bruxelles", ["name:fo"]= "Brussel" }, false,false, '|','de')
+{ ["name"] ="Bruxelles - Brussel", ["name:de"] = "Brüssel", ["name:en"] = "Brussels" , ["name:xx"] = "Brussel", ["name:af"] = "Brussel",["name:fr"]= "Bruxelles", ["name:fo"]= "Brussel" }, false, '|','de')
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Brixen|Bressanone‬",'',
-{ ["name"] = "Brixen - Bressanone", ["name:de"] = "Brixen", ["name:it"] = "Bressanone" }, false,false, '|','de')
+{ ["name"] = "Brixen - Bressanone", ["name:de"] = "Brixen", ["name:it"] = "Bressanone" }, false, '|','de')
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","Brixen",'',
-{ ["name"] = "Brixen - Bressanone", ["name:de"] = "Brixen" }, false,false, '|','de')
+{ ["name"] = "Brixen - Bressanone", ["name:de"] = "Brixen" }, false, '|','de')
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Merano|Meran‬",'',
-{ ["name"] = "Merano - Meran",["name:de"] = "Meran",["name:it"] = "Merano" },true,false, '|','de')
+{ ["name"] = "Merano - Meran",["name:de"] = "Meran",["name:it"] = "Merano" },true, '|','de')
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Meran|Merano‬",'',
-{ ["name"] = "Meran - Merano", ["name:de"] = "Meran",["name:it"] = "Merano" },true,false, '|','de')
+{ ["name"] = "Meran - Merano", ["name:de"] = "Meran",["name:it"] = "Merano" },true, '|','de')
 
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Rom|Roma‬",'',
-{ ["name"] = "Roma", ["name:de"] = "Rom" },false,false, '|', 'de')
+{ ["name"] = "Roma", ["name:de"] = "Rom" },false, '|', 'de')
 
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪Prof.-Dr.-No-Str. - Dr. No St.‬",'',
-{ ["name"]= "Dr. No Street",["name:de"]= "Professor-Doktor-No-Straße" },false,false,' - ',"de")
+{ ["name"]= "Dr. No Street",["name:de"]= "Professor-Doktor-No-Straße" },false,' - ',"de")
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Doktor-No-Straße - Dr. No Street‬",'',
-{ ["name"]= "Dr. No Street",["name:de"]= "Doktor-No-Straße"},false,false,' - ',"de")
+{ ["name"]= "Dr. No Street",["name:de"]= "Doktor-No-Straße"},false,' - ',"de")
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","Doktor-No-Straße",'',
-{ ["name:de"]= "Doktor-No-Straße"},false,false,' - ','de')
+{ ["name:de"]= "Doktor-No-Straße"},false,' - ','de')
 
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","Dr.-No-Str.",'',
-{ ["name:de"]= "Doktor-No-Straße"},false,false,' - ','de')
+{ ["name:de"]= "Doktor-No-Straße"},false,' - ','de')
 
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Doktor-No-Straße",'',
 {["name"]="Dr. No Street",["name:de"]="Doktor-No-Straße"},'de',nil)
@@ -212,30 +212,30 @@ checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags",
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Pekin",'',
 {["name"]="北京"},'de',{ 138.79, 36.08, 139.51, 36.77 })
 
-checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ул. Воздвиженка (Vozdvizhenka St.)‬",'',
-{["name"]= "улица Воздвиженка",["name:en"]= "Vozdvizhenka Street"},true,true,' ','de')
+checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ул. Воздвиженка - Vozdvizhenka St.‬",' - ',
+{["name"]= "улица Воздвиженка",["name:en"]= "Vozdvizhenka Street"},true,' - ','de')
 
-checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ул. Воздвиженка (ul. Vozdviženka)‬",'',
-{["name"]= "улица Воздвиженка"},true,true,' ','de')
+checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ул. Воздвиженка - ul. Vozdviženka‬",'',
+{["name"]= "улица Воздвиженка"},true,' - ','de')
 
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪вул. Молока - vul. Moloka‬",'',
-{["name"]= "вулиця Молока"},true,false,' - ','de')
+{["name"]= "вулиця Молока"},true,' - ','de')
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪주촌|Juchon‬",'',
-{["name"]= "주촌  Juchon", ["name:ko"]= "주촌",["name:ko_rm"]= "Juchon"},true,false,'|')
+{["name"]= "주촌  Juchon", ["name:ko"]= "주촌",["name:ko_rm"]= "Juchon"},true,'|')
 
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Juchon|주촌‬",'',
-{["name"]= "주촌", ["name:ko"]= "주촌",["name:ko_rm"]= "Juchon"},false,false,'|')
+{["name"]= "주촌", ["name:ko"]= "주촌",["name:ko_rm"]= "Juchon"},false,'|')
 
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ဘုရားကိုင်လမ်း|Pha Yar Kai Rd.‬",'',
-{["name"]= "ဘုရားကိုင်လမ်း Pha Yar Kai Road", ["highway"]= "secondary", ["name:en"]= "Pha Yar Kai Road", ["name:my"]= "ဘုရားကိုင်လမ်း"},true,false,'|')
+{["name"]= "ဘုရားကိုင်လမ်း Pha Yar Kai Road", ["highway"]= "secondary", ["name:en"]= "Pha Yar Kai Road", ["name:my"]= "ဘုရားကိုင်လမ်း"},true,'|')
 
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ဘုရားကိုင်လမ်း|Pha Yar Kai Rd.‬",'',
-{["name"]= "ဘုရားကိုင်လမ်း", ["highway"]= "secondary", ["name:en"]= "Pha Yar Kai Road", ["name:my"]= "ဘုရားကိုင်လမ်း"},true,false,'|')
+{["name"]= "ဘုရားကိုင်လမ်း", ["highway"]= "secondary", ["name:en"]= "Pha Yar Kai Road", ["name:my"]= "ဘုရားကိုင်လမ်း"},true,'|')
 
 -- special case here is that name:yue is a substring of name:zh (https://www.openstreetmap.org/way/35973184)
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪鳳凰徑第3段|Lantau Trail Section 3‬",'',
-{["name"]= "鳳凰徑第3段 Lantau Trail Section 3", ["name:en"]= "Lantau Trail Section 3", ["name:yue"]="鳳凰徑", ["name:zh"]="鳳凰徑第3段"},true,false,'|')
+{["name"]= "鳳凰徑第3段 Lantau Trail Section 3", ["name:en"]= "Lantau Trail Section 3", ["name:yue"]="鳳凰徑", ["name:zh"]="鳳凰徑第3段"},true,'|')
 
 print(passed .. " tests passed, " .. failed .. " tests failed.")
 
