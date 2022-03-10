@@ -128,9 +128,9 @@ class transcriptor:
 
   def transcript(self, id, country, unistr):
     if (country == ""):
-      vout("doing non-country specific transcription for >>%s<< (osm_id %s)\n" % (unistr,id))
+      vout("doing transcription for >>%s<< (generic, osm_id %s)\n" % (unistr,id))
     else:
-      vout("doing transcription >>%s<< (country %s, osm_id %s)\n" % (unistr,country,id))
+      vout("doing transcription for >>%s<< (country %s, osm_id %s)\n" % (unistr,country,id))
     if country == 'jp':
       # this should mimic the old api behavior (I hate API changes)
       # new API does not have all options anymore :(
@@ -174,16 +174,16 @@ class Coord2Country:
       self.features.append([shapely.prepared.prep(geom), cc])
     vout(f"Found boundaries: {boundaries}")
 
-  def getCountry(self,lon,lat):
+  def getCountry(self,id,lon,lat):
     if lon == '' or lat == '':
       return ''
     p = shapely.geometry.Point(float(lon), float(lat))
     for f in self.features:
       if f[0].contains(p):
         country = f[1]
-        vout("country for %s/%s is %s\n" % (lon,lat,country))
+        vout("country for %s/%s is %s (osm_id %s)\n" % (lon,lat,country,id))
         return f[1]
-    vout("country for %s/%s is unknown\n" % (lon,lat))
+    vout("country for %s/%s is unknown (osm_id %s)\n" % (lon,lat,id))
     return ''
 
 co2c = Coord2Country(args.geomdir)
@@ -231,7 +231,7 @@ async def handle_connection(reader, writer):
         (id,lon,lat,name) = qs
         # Do check for country only if string contains Thai or CJK characters
         if contains_cjk(name):
-          cc = co2c.getCountry(lon,lat)
+          cc = co2c.getCountry(id,lon,lat)
         else:
           if contains_thai(name):
             cc = 'th'
