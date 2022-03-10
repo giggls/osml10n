@@ -474,7 +474,7 @@ function osm2pgsql.process_node(object)
     end
     
     if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-        object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.tags, false, false, '\n', lang, object.get_bbox)
+        object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, object.get_bbox)
     end
 
     tables.point:add_row({tags = object.tags})
@@ -488,16 +488,16 @@ function osm2pgsql.process_way(object)
     local area_tags = isarea(object.tags)
     if object.is_closed and area_tags then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-            object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.tags, false, false, '\n', lang, object.get_bbox)
+            object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, object.get_bbox)
         end
         add_polygon(object.tags)
     else
         -- on line/road use streetname function on highways
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
             if (object.tags['highway'] ~= nil) then
-                object.tags['name_l10n_' .. lang] = osml10n.get_streetname_from_tags(object.tags, true, false, '\n', lang, object.get_bbox)
+                object.tags['name_l10n_' .. lang] = osml10n.get_streetname_from_tags(object.id, object.tags, true, false, '\n', lang, object.get_bbox)
             else
-                object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.tags, false, false, '\n', lang, object.get_bbox)
+                object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, object.get_bbox)
             end
         end
         add_line(object.tags)
@@ -518,7 +518,7 @@ function osm2pgsql.process_relation(object)
     end
     
     if ((object.tags['name'] ~= nil) and (object.tags['name:' .. lang] ~= nil)) then
-        object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.tags, false, false, '\n', lang, nil)
+        object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, nil)
     end
     
     if type == "boundary" or (type == "multipolygon" and object.tags["boundary"]) then
