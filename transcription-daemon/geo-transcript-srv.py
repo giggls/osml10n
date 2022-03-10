@@ -126,11 +126,11 @@ class transcriptor:
     # Kanji to Latin transcription instance via pykakasi
     self.kakasi = pykakasi.kakasi()
 
-  def transcript(self, country, unistr):
+  def transcript(self, id, country, unistr):
     if (country == ""):
-      vout("doing non-country specific transcription for >>%s<<\n" % unistr)
+      vout("doing non-country specific transcription for >>%s<< (osm_id %s)\n" % (unistr,id))
     else:
-      vout("doing transcription for >>%s<< (country %s)\n" % (unistr,country))
+      vout("doing transcription >>%s<< (country %s, osm_id %s)\n" % (unistr,country,id))
     if country == 'jp':
       # this should mimic the old api behavior (I hate API changes)
       # new API does not have all options anymore :(
@@ -240,7 +240,7 @@ async def handle_connection(reader, writer):
 
       try:
         if name != '':
-          reply = tc.transcript(cc,name)
+          reply = tc.transcript(id,cc,name)
         else:
           reply = ''
 

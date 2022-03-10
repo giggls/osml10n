@@ -17,7 +17,7 @@ function osml10n.geo_transcript(id,name,bbox)
   local lon,lat,reqbody
   local bx = {}
   if (bbox == nil) then
-    reqbody = "/" .. "/" .. name
+    reqbody = id .. "/" .. "/" .. name
   else
     if (type(bbox) == "function") then
       bx[1], bx[2], bx[3], bx[4] = bbox()

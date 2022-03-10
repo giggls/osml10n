@@ -134,29 +134,29 @@ end
 -- geo_transcript function via extrnal daemon
 
 -- Japan
-checkoutput(osml10n.geo_transcript,"geo_transcript","Toukyou",'',"東京",{ 138.79, 36.08, 139.51, 36.77 })
-checkoutput(osml10n.geo_transcript,"geo_transcript","Kanji 100 abc",'','漢字 100 abc',{ 138.79, 36.08, 139.51, 36.77 })
+checkoutput(osml10n.geo_transcript,"geo_transcript","Toukyou",'42',"東京",{ 138.79, 36.08, 139.51, 36.77 })
+checkoutput(osml10n.geo_transcript,"geo_transcript","Kanji 100 abc",'42','漢字 100 abc',{ 138.79, 36.08, 139.51, 36.77 })
 
 -- China
-checkoutput(osml10n.geo_transcript,"geo_transcript","dōng jīng",'',"東京",{113.05, 29.45, 115.73, 32.13})
-checkoutput(osml10n.geo_transcript,"geo_transcript","hàn zì 100 abc",'','漢字 100 abc',{113.05, 29.45, 115.73, 32.13})
+checkoutput(osml10n.geo_transcript,"geo_transcript","dōng jīng",'42',"東京",{113.05, 29.45, 115.73, 32.13})
+checkoutput(osml10n.geo_transcript,"geo_transcript","hàn zì 100 abc",'42','漢字 100 abc',{113.05, 29.45, 115.73, 32.13})
 -- international waters
-checkoutput(osml10n.geo_transcript,"geo_transcript","běi jīng",'','北京',{-30, 49, -29, 50})
+checkoutput(osml10n.geo_transcript,"geo_transcript","běi jīng",'42','北京',{-30, 49, -29, 50})
 
 -- Thailand
-checkoutput(osml10n.geo_transcript,"geo_transcript","hongsamut prachachon",'','ห้องสมุดประชาชน',{100, 14, 101, 15})
-checkoutput(osml10n.geo_transcript,"geo_transcript","thai thanon khaosan 100",'','thai ถนนข้าวสาร 100',{100, 14, 101, 15})
+checkoutput(osml10n.geo_transcript,"geo_transcript","hongsamut prachachon",'42','ห้องสมุดประชาชน',{100, 14, 101, 15})
+checkoutput(osml10n.geo_transcript,"geo_transcript","thai thanon khaosan 100",'42','thai ถนนข้าวสาร 100',{100, 14, 101, 15})
 
 -- Macau
-checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'',"香港",{113.54, 22.16, 113.58, 22.2})
+checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港",{113.54, 22.16, 113.58, 22.2})
 
 -- Hongkong
-checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'',"香港",{114.15, 22.28, 114.2, 22.33})
+checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港",{114.15, 22.28, 114.2, 22.33})
 
 -- cyrillic nowhere and anywhere on the atlantic
-checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'',"Москва́",nil)
+checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",nil)
 -- international waters
-checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'',"Москва́",{-30, 49, -29, 50})
+checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",{-30, 49, -29, 50})
 
 
 print("")
