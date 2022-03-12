@@ -7,15 +7,38 @@ local transcript = require "osml10n.geo_transcript"
 local rex = require "rex_pcre"
 
 -- set to true to enable debug output of langage selection state machine 
-local debugoutput = true 
+local debugoutput = false
 
 -- 5 most commonly spoken languages using latin script (hopefully)
 local latin_langs = {"en","fr","es","pt","de"}
 
 function dbgprint(msg)
   if debugoutput then
-    print(msg)
+    io.stderr:write(msg .. '\n')
   end
+end
+
+-- create a propper "list" like object from a table with numbered keys
+function dense_table(t)
+  local indices = {}
+  for i,_ in pairs(t) do
+    table.insert(indices, i)
+  end
+  table.sort(indices)
+
+  local dense_table = {}
+  for _,i in pairs(indices) do
+    table.insert(dense_table, t[i])
+  end
+
+  return dense_table
+end
+
+-- remove a given key from table
+function table.removekey(table, key)
+   local element = table[key]
+   table[key] = nil
+   return element
 end
 
 -- get country code from tag or nil in case of no country-code
@@ -55,7 +78,7 @@ end
 -- 
 -- NOTE: Variable local_name must contain the desired TAG (e.g. name:de) not the actual name string itself!
 --
-function osml10n.gen_combined_names(local_name, tags, localized_name_last, is_street, non_latin)
+function osml10n.gen_combined_names(local_tag, tags, localized_name_last, is_street, non_latin)
 
   local resarr = {"",""}
   local unacc, unacc_local, unacc_tag
@@ -65,11 +88,19 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_last, is_st
   local langcode
   local tag,v
   local additional_names={}
+  local local_name
   
   if (is_street == nil) then is_street = false end
   if (non_latin == nil) then non_latin = false end
   
-  langcode = langcode_code_from_tag(local_name)
+  langcode = langcode_code_from_tag(local_tag)
+  local_name = tags[local_tag]
+
+  -- this is a pseudo tag which is only used internally
+  if (langcode == 'l10n_Latn') then
+    -- table.remove(tags,'l10n_Latn')
+    table.removekey(tags,local_tag)
+  end
   
   -- index for inserting name and localized name
   if localized_name_last then
@@ -80,9 +111,9 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_last, is_st
   local name = 'name'
   if (tags["name"] == nil) then
     if (is_street) then
-      resarr[idxl]=sabbrev.street_abbrev(tags[local_name],langcode);
+      resarr[idxl]=sabbrev.street_abbrev(local_name,langcode);
     else
-      resarr[idxl]=tags[local_name]
+      resarr[idxl]=local_name
     end
     return resarr
   end
@@ -107,16 +138,15 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_last, is_st
   else
     unacc = tags['name']  
   end
-  unacc_local = unaccent.unaccent(tags[local_name])
+  unacc_local = unaccent.unaccent(local_name)
   found = false;
   pos = string.find(unacc,unacc_local:gsub("%W", "%%%1"))
 
   -- ignore localized_name_last option if localized_name_last is specified but our localized
   -- name is on position 1 in generic name tag.
   pos=rex.find(' ' .. unacc .. ' ', '[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_local .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]')
-  if (pos == 1) then
+  if ((pos == 1) and localized_name_last)then
     dbgprint("forcing localized_name_last=false")
-    -- idxl = 1 idxn = 2
     localized_name_last=false
   end
   
@@ -138,30 +168,35 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_last, is_st
       -- a lower position in "name" string means name is more important
       local tmp_names = {}
       local tpos = 0
+
+      -- extract name:* tags which are languages and order them
+      -- ignore anything else like name:left name:right or romanized versions of the name
+      local lang_names = {}
       for tag,v in pairs(tags) do
-        -- ignore all the name:* tags which are not languages here
-        -- e.g. something like name:left name:right or romanized versions of the name
         if string.match(tag,'^name:[a-z][a-z][a-z]?$') then
-	  unacc_tag = unaccent.unaccent(v)
-	  if (unacc_tag ~= unacc_local) then
-	    local utag_pos=rex.find(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]')
-	    if (utag_pos  ~= nil) then
-	      tmp_names[utag_pos]=tag
-	      dbgprint('found additional name ' .. tag .. ' (' .. v .. ')');
-	      found=true;
-	    end
-	  end
+          table.insert(lang_names,tag)
         end
       end
-      for _,x in pairs(tmp_names) do
-        table.insert(additional_names, x)
+      table.sort(lang_names)
+      
+      for _,tag in ipairs(lang_names) do
+	unacc_tag = unaccent.unaccent(tags[tag])
+	if (unacc_tag ~= unacc_local) then
+	  local utag_pos=rex.find(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]')
+	  if (utag_pos  ~= nil) then
+	    tmp_names[utag_pos]=tag
+	    dbgprint('found additional name ' .. tag .. ' (' .. tags[tag] .. ')');
+	    found=true;
+	  end
+	end
       end
+      additional_names = dense_table(tmp_names)
       
       if not found then
         if is_street then
-          resarr[idxl] = sabbrev.street_abbrev_all(tags[local_name])
+          resarr[idxl] = sabbrev.street_abbrev_all(local_name)
         else
-          resarr[idxl] = tags[local_name]
+          resarr[idxl] = local_name
         end
       return(resarr)
       end
@@ -174,9 +209,9 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_last, is_st
   if is_street then
     if not localized_name_last then
       if (langcode ~= nil) then
-        table.insert(resarr,sabbrev.street_abbrev(tags[local_name],langcode))
+        table.insert(resarr,sabbrev.street_abbrev(local_name,langcode))
       else
-        table.insert(resarr,sabbrev.street_abbrev_latin(tags[local_name]))
+        table.insert(resarr,sabbrev.street_abbrev_latin(local_name))
       end
     end
     for _,v in ipairs(additional_names) do
@@ -192,20 +227,20 @@ function osml10n.gen_combined_names(local_name, tags, localized_name_last, is_st
     end
     if localized_name_last then
       if (langcode ~= nil) then
-        table.insert(resarr,sabbrev.street_abbrev(tags[local_name],langcode))
+        table.insert(resarr,sabbrev.street_abbrev(local_name,langcode))
       else
-        table.insert(resarr,sabbrev.street_abbrev_latin(tags[local_name]))
+        table.insert(resarr,sabbrev.street_abbrev_latin(local_name))
       end
     end
   else
     if not localized_name_last then
-      table.insert(resarr,tags[local_name])
+      table.insert(resarr,local_name)
     end
     for _,v in ipairs(additional_names) do
       table.insert(resarr,tags[v])
     end
     if localized_name_last then
-      table.insert(resarr,tags[local_name])
+      table.insert(resarr,local_name)
     end
   end
   return(resarr)
@@ -276,11 +311,11 @@ function osml10n.get_names_from_tags(id, tags, localized_name_last, is_street, t
       end
     end
     if is_street then
-      tags['name:Latn']=transcript.geo_transcript(id,sabbrev.street_abbrev_non_latin(tags['name']),place)
+      tags['name:l10n_Latn']=transcript.geo_transcript(id,sabbrev.street_abbrev_non_latin(tags['name']),place)
     else
-      tags['name:Latn']=transcript.geo_transcript(id,tags['name'],place)
+      tags['name:l10n_Latn']=transcript.geo_transcript(id,tags['name'],place)
     end
-      return osml10n.gen_combined_names('name:Latn',tags,localized_name_last,is_street);  
+      return osml10n.gen_combined_names('name:l10n_Latn',tags,localized_name_last,is_street);  
   else
     return resarr; 
   end
