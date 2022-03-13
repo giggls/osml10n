@@ -305,7 +305,7 @@ function osml10n.get_names_from_tags(id, tags, localized_name_last, is_street, t
     -- Just use the first tag of this kind found, because
     -- having more than one of them does not make sense
     for tag,_ in pairs(tags) do
-      if (string.match(tag,'^name:.+_rm$') or string.match(tag,'^name:.+-Latn$')) then
+      if (string.match(tag,'^name:[a-z][a-z][a-z]?_rm$') or string.match(tag,'^name:[a-z][a-z][a-z]?-Latn$')) then
         dbgprint( 'found romanization name tag ' .. tag)
         return osml10n.gen_combined_names(tag,tags,localized_name_last,is_street,true);
       end
@@ -358,8 +358,10 @@ function osml10n.get_localized_name_from_tags(id, tags, targetlang, place)
     -- this usually looks like name:ja_rm or  name:ko-Latn
     -- Just use the first tag of this kind found, because
     -- having more than one of them does not make sense
+    -- make sure, that something like name:left:* does not match, as
+    -- we can not support this
     for tag,_ in pairs(tags) do
-      if (string.match(tag,'^name:.+_rm$') or string.match(tag,'^name:.+-Latn$')) then
+      if (string.match(tag,'^name:[a-z][a-z][a-z]?_rm$') or string.match(tag,'^name:[a-z][a-z][a-z]?-Latn$')) then
         dbgprint( 'found romanization name tag ' .. tag)
         return tags[tag]
       end
