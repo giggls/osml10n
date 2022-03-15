@@ -48,41 +48,41 @@ open an issue here.
 
 ### Japan
 ```
-curl --data "142/43/東京" http://localhost:8080
+transcription-cli/transcribe.py "XY//142/43/東京"
 Toukyou
-curl --data "jp/東京" http://localhost:8080
+transcription-cli/transcribe.py "CC//jp/東京"
 Toukyou
 ```
 
 ### China
 ```
-curl --data "130/43/東京" http://localhost:8080
+transcription-cli/transcribe.py "XY//130/43/東京"
 dōng jīng
-curl --data "cn/東京" http://localhost:8080
+transcription-cli/transcribe.py "CC//cn/東京"
 dōng jīng
 ```
 
 ### Thailand
 ```
-curl --data "101/16/ห้องสมุดประชาชน" http://localhost:8080
+transcription-cli/transcribe.py "XY//101/16/ห้องสมุดประชาชน"
 hongsamut prachachon
-curl --data "th/ห้องสมุดประชาชน" http://localhost:8080
+transcription-cli/transcribe.py "CC//th/ห้องสมุดประชาชน"
 hongsamut prachachon
 ```
 
 ### Macau
 ```
-curl --data "113.6/22.1/香港" http://localhost:8080
+transcription-cli/transcribe.py "XY//113.6/22.1/香港"
 hōeng góng
-curl --data "mo/香港" http://localhost:8080
+transcription-cli/transcribe.py "CC//mo/香港"
 hōeng góng
 ```
 
 ### Hongkong
 ```
-curl --data "113.9/22.25/香港" http://localhost:8080
+transcription-cli/transcribe.py "XY//113.9/22.25/香港"
 hōeng góng
-curl --data "hk/香港" http://localhost:8080
+transcription-cli/transcribe.py "CC//hk/香港"
 hōeng góng
 ```
 

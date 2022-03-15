@@ -131,7 +131,7 @@ for _, lang in pairs({"de", "en", "fr"}) do
   print("")
 end
 
--- geo_transcript function via extrnal daemon
+-- geo_transcript function via external daemon
 
 -- Japan
 checkoutput(osml10n.geo_transcript,"geo_transcript","Toukyou",'42',"東京",{ 138.79, 36.08, 139.51, 36.77 })
@@ -159,6 +159,9 @@ checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва
 -- international waters
 checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",{-30, 49, -29, 50})
 
+-- check with / (slash character) in the name
+checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",{114.15, 22.28, 114.2, 22.33})
+checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",nil)
 
 print("")
 

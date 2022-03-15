@@ -216,29 +216,34 @@ async def send_reply(writer, reply):
 async def handle_connection(reader, writer):
     vout('New connection\n')
     while True:
-      data = await read_request(reader)
-      if data is None:
-        vout('Connection closed\n')
-        return
-
-      # We support the following formats:
-      # id/cc/string
-      # id/lon/lat/string
-      qs = data.split('/',3)
-      if len(qs) == 3:
-        (id,cc,name) = qs
-      else:
-        (id,lon,lat,name) = qs
-        # Do check for country only if string contains Thai or CJK characters
-        if contains_cjk(name):
-          cc = co2c.getCountry(id,lon,lat)
-        else:
-          if contains_thai(name):
-            cc = 'th'
-          else:
-            cc = ''
-
+      id = 'unknown'
       try:
+        data = await read_request(reader)
+        if data is None:
+          vout('Connection closed\n')
+          return
+
+        # We support the following formats:
+        # CC/id/cc/string
+        # XY/id/lon/lat/string
+        cmd = data[0:2]
+        if cmd == 'CC':
+          (id,cc,name) = data[3:].split('/', 2)
+        elif cmd == 'XY':
+          (id,lon,lat,name) = data[3:].split('/', 3)
+          # Do check for country only if string contains Thai or CJK characters
+          if contains_cjk(name):
+            cc = co2c.getCountry(id,lon,lat)
+          else:
+            if contains_thai(name):
+              cc = 'th'
+            else:
+              cc = ''
+        else:
+          sys.stderr.write(f"Ignore unkown command '{cmd}'\n")
+          await send_reply(writer, '')
+          continue
+
         if name != '':
           reply = tc.transcript(id,cc,name)
         else:
