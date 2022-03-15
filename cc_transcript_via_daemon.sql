@@ -26,7 +26,7 @@ CREATE or REPLACE FUNCTION osml10n_cc_translit(name text, country text DEFAULT '
   try:
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((host, port))
-    data = ('X/' + country + '/' + name).encode('utf-8');
+    data = ('CC/X/' + country + '/' + name).encode('utf-8');
 
     length = len(data)
     sock.sendall(struct.pack('I', length) + data)

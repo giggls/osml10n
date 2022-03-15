@@ -2,7 +2,7 @@
 #
 #  Usage: transcribe.py REQUEST
 #
-#  REQUEST must be in format ID/CC/WORDS or ID/LON/LAT/WORDS.
+#  REQUEST must be in format "CC/id/cc/words" or "XY/id/lon/lat/words".
 #
 
 import socket
@@ -10,14 +10,14 @@ import struct
 import sys
 
 def die_usage():
-    sys.stdout.write("uasge: %s ID/CC/WORDS|ID/LON/LAT/WORDS\n" % sys.argv[0])
+    sys.stdout.write("usage: %s CC/id/cc/words|XY/id/lon/lat/words\n" % sys.argv[0])
     sys.exit(1)
 
 if (len(sys.argv) != 2):
     die_usage()
 
-arglen =len(sys.argv[1].split('/'))
-if (arglen < 2) or (arglen > 3):
+arglen = len(sys.argv[1].split('/'))
+if (arglen < 4) or (arglen > 5):
     die_usage()
 
 sock = socket.create_connection(('localhost', 8033))

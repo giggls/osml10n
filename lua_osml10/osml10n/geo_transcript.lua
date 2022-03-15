@@ -17,7 +17,7 @@ function osml10n.geo_transcript(id,name,bbox)
   local lon,lat,reqbody
   local bx = {}
   if (bbox == nil) then
-    reqbody = id .. "/" .. "/" .. name
+    reqbody = "CC/" .. id .. "/" .. "/" .. name
   else
     if (type(bbox) == "function") then
       bx[1], bx[2], bx[3], bx[4] = bbox()
@@ -27,7 +27,7 @@ function osml10n.geo_transcript(id,name,bbox)
     end
       lon = (bx[1]+bx[3])/2.0
       lat = (bx[2]+bx[4])/2.0
-    reqbody = id .. "/" .. lon .. "/" .. lat .. "/" .. name
+    reqbody = "XY/" .. id .. "/" .. lon .. "/" .. lat .. "/" .. name
   end
 
   sock:send(string.pack('s4', reqbody))
