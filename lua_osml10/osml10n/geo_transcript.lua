@@ -21,12 +21,17 @@ function osml10n.geo_transcript(id,name,bbox)
   else
     if (type(bbox) == "function") then
       bx[1], bx[2], bx[3], bx[4] = bbox()
-    -- asume bbox ist table type otherwise
+    -- assume bbox is table type otherwise
     else
       bx = bbox
     end
+    if (bx[1] ~= nil) then
       lon = (bx[1]+bx[3])/2.0
       lat = (bx[2]+bx[4])/2.0
+    else
+      lon = 0
+      lat = 0
+    end
     reqbody = "XY/" .. id .. "/" .. lon .. "/" .. lat .. "/" .. name
   end
 
