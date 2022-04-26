@@ -23,26 +23,30 @@ col_definitions = {
     point = {
         { column = 'way', type = 'point' },
         { column = 'tags', type = 'hstore' },
-        { column = 'layer', type = 'int4' }
+        { column = 'layer', type = 'int4' },
+        { column = 'name_l10n', sql_type = 'text[2]'}
     },
     line = {
         { column = 'way', type = 'linestring' },
         { column = 'tags', type = 'hstore' },
         { column = 'layer', type = 'int4' },
-        { column = 'z_order', type = 'int4' }
+        { column = 'z_order', type = 'int4' },
+        { column = 'name_l10n', sql_type = 'text[2]'}
     },
     roads = {
         { column = 'way', type = 'linestring' },
         { column = 'tags', type = 'hstore' },
         { column = 'layer', type = 'int4' },
-        { column = 'z_order', type = 'int4' }
+        { column = 'z_order', type = 'int4' },
+        { column = 'name_l10n', sql_type = 'text[2]'}
     },
     polygon = {
         { column = 'way', type = 'geometry' },
         { column = 'tags', type = 'hstore' },
         { column = 'layer', type = 'int4' },
         { column = 'z_order', type = 'int4' },
-        { column = 'way_area', type = 'area' }    
+        { column = 'way_area', type = 'area' },
+        { column = 'name_l10n', sql_type = 'text[2]'}
     },
     route = {
         { column = 'member_id', type = 'int8' },
@@ -430,30 +434,33 @@ function split_tags(tags, tag_map)
     return cols
 end
 
-function add_line(tags)
+function add_line(tags, name_l10n)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
     cols['z_order'] = z_order(tags)
     cols.way = { create = 'line', split_at = 100000 }
+    cols.name_l10n = name_l10n
     tables.line:add_row(cols)
 end
 
-function add_roads(tags)
+function add_roads(tags, name_l10n)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
     cols['z_order'] = z_order(tags)
     cols.way = { create = 'line', split_at = 100000 }
+    cols.name_l10n = name_l10n
     tables.roads:add_row(cols)
 end
 
-function add_polygon(tags)
+function add_polygon(tags, name_l10n)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
     cols['z_order'] = z_order(tags)
-    cols.way = { create = 'area', multi = true }
+    cols.way = { create = 'area'}
+    cols.name_l10n = name_l10n
     tables.polygon:add_row(cols)
 end
 
@@ -468,19 +475,31 @@ function add_route(object)
     end
 end
 
+-- replacing the following:
+-- " by \"
+-- \ by \\
+function table2escapedarray(names)
+  local n1,n2
+  n1=string.gsub(names[1],'["\\]','\\%0')
+  n2=string.gsub(names[2],'["\\]','\\%0')
+  return '{\"' .. n1 .. '\",\"' .. n2 .. "\"}"
+end
+
 function osm2pgsql.process_node(object)
+    local names,name_l10n
     if clean_tags(object.tags) then
         return
     end
-    
+        
     if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-        object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, object.get_bbox)
+        names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
+        name_l10n = table2escapedarray(names)
     end
-
-    tables.point:add_row({tags = object.tags})
+    tables.point:add_row({tags = object.tags, name_l10n = name_l10n})
 end
 
 function osm2pgsql.process_way(object)
+    local names,name_l10n
     if clean_tags(object.tags) then
         return
     end
@@ -488,27 +507,31 @@ function osm2pgsql.process_way(object)
     local area_tags = isarea(object.tags)
     if object.is_closed and area_tags then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-            object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, object.get_bbox)
+            names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
+            name_l10n = table2escapedarray(names)
         end
-        add_polygon(object.tags)
+        add_polygon(object.tags, name_l10n)
     else
         -- on line/road use streetname function on highways
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
             if (object.tags['highway'] ~= nil) then
-                object.tags['name_l10n_' .. lang] = osml10n.get_streetname_from_tags(object.id, object.tags, true, false, '\n', lang, object.get_bbox)
+                names = osml10n.get_names_from_tags(object.id, object.tags, false, true, lang, object.get_bbox)
             else
-                object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, object.get_bbox)
+            	names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
             end
+            name_l10n = table2escapedarray(names)
         end
-        add_line(object.tags)
+        add_line(object.tags, name_l10n)
 
         if roads(object.tags) then
-            add_roads(object.tags)
+            add_roads(object.tags, name_l10n)
         end
     end
 end
 
 function osm2pgsql.process_relation(object)
+    local names,name_l10n
+    
     -- grab the type tag before filtering tags
     local type = object.tags.type
     object.tags.type = nil
@@ -517,27 +540,28 @@ function osm2pgsql.process_relation(object)
         return
     end
     
-    if ((object.tags['name'] ~= nil) and (object.tags['name:' .. lang] ~= nil)) then
-        object.tags['name_l10n_' .. lang] = osml10n.get_placename_from_tags(object.id, object.tags, false, false, '\n', lang, nil)
+    if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
+        names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
+        name_l10n = table2escapedarray(names)
     end
     
     if type == "boundary" or (type == "multipolygon" and object.tags["boundary"]) then
-        add_line(object.tags)
+        add_line(object.tags, name_l10n)
 
         if roads(object.tags) then
-            add_roads(object.tags)
+            add_roads(object.tags, name_l10n)
         end
 
-        add_polygon(object.tags)
+        add_polygon(object.tags, name_l10n)
 
     elseif type == "multipolygon" then
-        add_polygon(object.tags)
+        add_polygon(object.tags, name_l10n)
     elseif type == "route" then
-        add_line(object.tags)
+        add_line(object.tags, name_l10n)
         add_route(object)
         -- TODO: Remove this, roads tags don't belong on route relations
         if roads(object.tags) then
-            add_roads(object.tags)
+            add_roads(object.tags, name_l10n)
         end
     end
 end
