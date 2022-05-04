@@ -13,6 +13,9 @@ local osml10n = require "osml10n"
 -- Target language
 local lang = 'de'
 
+-- Set this to false if you want to keep name tags in hstore
+local remove_names = true
+
 -- Table name prefix
 local prefix = "planet_osm_hstore"
 
@@ -420,6 +423,20 @@ function clean_tags(tags)
     return next(tags) == nil
 end
 
+--- Remove name tags
+function remove_name_tags(tags)
+    tags['name'] = nil
+    tags['int_name'] = nil
+    -- delete all 'name:' tags
+    for tag, _ in pairs (tags) do
+        if string.sub(tag, 1, 5) == 'name:' then
+            tags[tag] = nil
+        end
+    end
+
+    return next(tags) == nil
+end
+
 --- Splits a tag into tags and hstore tags
 -- @return columns, hstore tags
 function split_tags(tags, tag_map)
@@ -494,6 +511,7 @@ function osm2pgsql.process_node(object)
     if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
         names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
         name_l10n = table2escapedarray(names)
+        if remove_names then remove_name_tags(object.tags) end
     end
     tables.point:add_row({tags = object.tags, name_l10n = name_l10n})
 end
@@ -509,6 +527,7 @@ function osm2pgsql.process_way(object)
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
             names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
             name_l10n = table2escapedarray(names)
+            if remove_names then remove_name_tags(object.tags) end
         end
         add_polygon(object.tags, name_l10n)
     else
@@ -520,6 +539,7 @@ function osm2pgsql.process_way(object)
             	names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
             end
             name_l10n = table2escapedarray(names)
+            if remove_names then remove_name_tags(object.tags) end
         end
         add_line(object.tags, name_l10n)
 
@@ -543,6 +563,7 @@ function osm2pgsql.process_relation(object)
     if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
         names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
         name_l10n = table2escapedarray(names)
+        if remove_names then remove_name_tags(object.tags) end
     end
     
     if type == "boundary" or (type == "multipolygon" and object.tags["boundary"]) then
