@@ -509,7 +509,7 @@ function osm2pgsql.process_node(object)
     end
         
     if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-        names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
+        names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
         name_l10n = table2escapedarray(names)
         if remove_names then remove_name_tags(object.tags) end
     end
@@ -525,7 +525,7 @@ function osm2pgsql.process_way(object)
     local area_tags = isarea(object.tags)
     if object.is_closed and area_tags then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-            names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
+            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
@@ -534,9 +534,9 @@ function osm2pgsql.process_way(object)
         -- on line/road use streetname function on highways
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
             if (object.tags['highway'] ~= nil) then
-                names = osml10n.get_names_from_tags(object.id, object.tags, false, true, lang, object.get_bbox)
+                names = osml10n.get_names_from_tags(object.id, object.tags, true, true, lang, object.get_bbox)
             else
-            	names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
+            	names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
             end
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
@@ -561,7 +561,7 @@ function osm2pgsql.process_relation(object)
     end
     
     if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-        names = osml10n.get_names_from_tags(object.id, object.tags, false, false, lang, object.get_bbox)
+        names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
         name_l10n = table2escapedarray(names)
         if remove_names then remove_name_tags(object.tags) end
     end
