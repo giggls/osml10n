@@ -114,6 +114,7 @@ print("")
 checkoutput(osml10n.list2string,"list2string","Indien|भारत|India",{ "Indien", "भारत", "India" },'|')
 print("")
 checkoutput(osml10n.get_country_name,"get_country_name",{ "Indien", "भारत", "India" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "de")
+checkoutput(osml10n.get_country_name,"get_country_name",{ "भारत", "India", "Indien" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "de", true)
 checkoutput(osml10n.get_country_name,"get_country_name",{ "India", "भारत" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "en")
 print("")
 

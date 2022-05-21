@@ -9,7 +9,7 @@ This is when the first versions of the OSMl10n functions were born.
 At this time implementing them in PL/pgSQL as PostgreSQL stored procedures
 seemed to be a natural choice.
 
-Actually this is what the [current implementation](https://github.com/giggls/mapnik-german-l10n)
+Actually this is what the [legacy implementation](https://github.com/giggls/mapnik-german-l10n)
 still does.
 
 However starting in 2019 this approach started to show a couple of
@@ -34,15 +34,7 @@ Discussing other approaches we now came up with the following idea:
 * Have a transcription daemon written in Python
 * Implement a library written in Lua language which can be plugged into the
   Lua tag transformation script of [osm2pgsql](https://github.com/openstreetmap/osm2pgsql)
-  (flex backend).
-
-As an alternative ``cc_transcript_via_daemon.sql`` can be used as drop-in
-replacement for the legacy code which uses the daemon for transcription
-instead of stored procedures.  The main benefit of using this function is
-Cantonese transcription support.
-
-If you have an idea for an even better approach than this one feel free to
-open an issue here.
+  (flex backend) or used with the standalone software [osm-tags-transform](https://github.com/osmcode/osm-tags-transform)
 
 ## Tests
 

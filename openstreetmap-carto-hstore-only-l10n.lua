@@ -14,10 +14,12 @@ local osml10n = require "osml10n"
 local lang = 'de'
 
 -- Set this to false if you want to keep name tags in hstore
-local remove_names = true
+local remove_names = false
 
 -- Table name prefix
 local prefix = "planet_osm_hstore"
+
+local langs = require "osml10n.country_languages"
 
 local tables = {}
 
@@ -49,7 +51,7 @@ col_definitions = {
         { column = 'layer', type = 'int4' },
         { column = 'z_order', type = 'int4' },
         { column = 'way_area', type = 'area' },
-        { column = 'name_l10n', sql_type = 'text[2]'}
+        { column = 'name_l10n', sql_type = 'text[]'}
     },
     route = {
         { column = 'member_id', type = 'int8' },
@@ -496,10 +498,18 @@ end
 -- " by \"
 -- \ by \\
 function table2escapedarray(names)
-  local n1,n2
-  n1=string.gsub(names[1],'["\\]','\\%0')
-  n2=string.gsub(names[2],'["\\]','\\%0')
-  return '{\"' .. n1 .. '\",\"' .. n2 .. "\"}"
+  local res
+  local count = 0
+  res = '{\"'
+  for k,v in ipairs(names) do
+    res = res .. string.gsub(names[k],'["\\]','\\%0') .. '\",\"'
+    count = count + 1
+  end
+  if count < 2 then
+    res = res .. '\"\"x'
+  end
+  res = string.sub(res, 0, -3) .. "}"
+  return res
 end
 
 function osm2pgsql.process_node(object)
@@ -550,7 +560,7 @@ function osm2pgsql.process_way(object)
 end
 
 function osm2pgsql.process_relation(object)
-    local names,name_l10n
+    local names,languages,name_l10n
     
     -- grab the type tag before filtering tags
     local type = object.tags.type
@@ -560,13 +570,15 @@ function osm2pgsql.process_relation(object)
         return
     end
     
-    if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-        names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
-        name_l10n = table2escapedarray(names)
-        if remove_names then remove_name_tags(object.tags) end
-    end
-    
     if type == "boundary" or (type == "multipolygon" and object.tags["boundary"]) then
+    	-- add custom naming of countries because name is noit reliable
+    	if ((object.tags['admin_level'] == '2') and (object.tags['ISO3166-1:alpha2'] ~= nil)) then
+    	    names = osml10n.get_country_name(object.tags, lang, true)
+    	else
+    	    names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+    	end
+    	name_l10n = table2escapedarray(names)
+    	if remove_names then remove_name_tags(object.tags) end
         add_line(object.tags, name_l10n)
 
         if roads(object.tags) then
@@ -576,8 +588,18 @@ function osm2pgsql.process_relation(object)
         add_polygon(object.tags, name_l10n)
 
     elseif type == "multipolygon" then
+        if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
+            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+            name_l10n = table2escapedarray(names)
+            if remove_names then remove_name_tags(object.tags) end
+        end
         add_polygon(object.tags, name_l10n)
     elseif type == "route" then
+        if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
+            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+            name_l10n = table2escapedarray(names)
+            if remove_names then remove_name_tags(object.tags) end
+        end
         add_line(object.tags, name_l10n)
         add_route(object)
         -- TODO: Remove this, roads tags don't belong on route relations

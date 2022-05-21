@@ -9,6 +9,7 @@
 -- So the following changes have been made:
 -- * Remove regional only languages (e.g. in Italy"," Spain and UK)
 -- * Remove anything but the 3 most important languages
+-- * Remove duplicates when names are the same or nearly the same in different languages
 --
 -- If you think the rendering for a specific country is not appropriate
 -- please file a bug with a better suggestion on github
@@ -30,7 +31,7 @@ local langs = {
 ["aw"] = {"nl","pap"},
 ["ax"] = {"sv"},
 ["az"] = {"az"},
-["ba"] = {"bs","hr","sr"},
+["ba"] = {"bs","sr"},
 ["bb"] = {"en"},
 ["bd"] = {"bn"},
 ["be"] = {"nl","fr","de"},
@@ -83,7 +84,7 @@ local langs = {
 ["er"] = {"ti","ar","en"},
 ["es"] = {"es"},
 ["et"] = {"am","om"},
-["fi"] = {"fi","sv","se"},
+["fi"] = {"fi","se"},
 ["fj"] = {"en"},
 ["fk"] = {"en"},
 ["fm"] = {"en"},
@@ -180,7 +181,7 @@ local langs = {
 ["ng"] = {"en"},
 ["ni"] = {"es"},
 ["nl"] = {"nl"},
-["no"] = {"nb","nn","no"},
+["no"] = {"no"},
 ["np"] = {"ne"},
 ["nr"] = {"na","en"},
 ["nu"] = {"niu","en"},
@@ -205,7 +206,7 @@ local langs = {
 ["ro"] = {"ro"},
 ["rs"] = {"sr"},
 ["ru"] = {"ru"},
-["rw"] = {"rw","fr","en"},
+["rw"] = {"rw"},
 ["sa"] = {"ar"},
 ["sb"] = {"en"},
 ["sc"] = {"fr","en","crs"},
@@ -258,6 +259,7 @@ local langs = {
 ["vu"] = {"bi","en","fr"},
 ["wf"] = {"fr"},
 ["ws"] = {"sm","en"},
+["xk"] = {"en","af"},
 ["ye"] = {"ar"},
 ["yt"] = {"fr"},
 ["za"] = {"af","zu","xh"},
