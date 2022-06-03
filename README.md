@@ -22,10 +22,10 @@ Development is currently done on Debian GNU/Linux thus it is strongly
 recommended to also use a Debian or Ubuntu based system for deployment.
 
 If you are working on a Windows based system using the
-[Windows-Subsystem for Linux]https://docs.microsoft.com/de-de/windows/wsl/
+[Windows-Subsystem for Linux](https://docs.microsoft.com/de-de/windows/wsl/)
 is a viable option.
 
-See [INSTALL.md] for installation instructions.
+See [INSTALL.md](INSTALL.md) for installation instructions.
 
 ## History
 
