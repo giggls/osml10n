@@ -48,7 +48,7 @@ auto-start after the Debian packages have been installed).
 If you get errors while calling ``make test`` please report them on Github.
 
 I am particularly interested in problems regarding the current LTS versions
-of Ubuntu and other Linux distributions than Debian stabe as I am not using
+of Ubuntu and other Linux distributions than Debian stable as I am not using
 them myself.
 
 ## Rendering a l10n version of Openstreetmap Carto
