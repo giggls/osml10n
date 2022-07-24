@@ -14,7 +14,7 @@ installation is as follows:
 **This code will not work with lua versions below 5.3!**
 
 ```
-apt install libunac1-dev luarocks lua5.3
+apt install libunac1-dev luarocks lua5.3 libpcre3-dev liblua5.3-dev
 
 luarocks install lrexlib-pcre
 ```
@@ -25,12 +25,14 @@ them with native Lua patterns.
 ### Python
 
 ```
-apt install python3-icu python3-shapely
+apt install python3-icu python3-shapely python3-pip python3-sdnotify python3-requests
 
 pip install pykakasi
 pip install tltk
 pip install pinyin_jyutping_sentence
 ```
+
+Might need to use ``pip3`` instead of ``pip`` in older versions of Debin/Ubuntu.
 
 ## Installation
 
