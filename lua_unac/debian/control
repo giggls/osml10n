@@ -2,7 +2,7 @@ Source: lua-unaccent
 Section: unknown
 Priority: optional
 Maintainer: Sven Geggus <sven-debian@geggus.net>
-Build-Depends: debhelper (>= 11)
+Build-Depends: liblua5.3-dev, debhelper (>= 11)
 Standards-Version: 4.1.3
 Homepage: <insert the upstream URL, if relevant>
 
