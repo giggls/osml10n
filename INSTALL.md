@@ -39,6 +39,10 @@ Might need to use ``pip3`` instead of ``pip`` in older versions of Debin/Ubuntu.
 On **Debian/Ubuntu** just call ``make deb`` after installing Python and Lua
 prerequisites inside base and ``lua_unac`` directories.
 
+To do this the ``dpkg-dev`` package has to be installed.
+``dpkg-buildpackage`` might complain about further dependencies in this
+process. Just install them as requested in this case.
+
 This will give you two Debian packages which can be installed on the system.
 
 To test if your installation is working as expected call ``make test``
