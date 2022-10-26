@@ -60,13 +60,12 @@ them myself.
 ## Rendering a l10n version of Openstreetmap Carto
 
 If you inted to use this code for rendering a localized version of Openstreetmap Carto
-a suitable version of calling osm2pgsql would be as follows:
+calling osm2pgsql as follows should work.
+
+Have a look at https://osm2pgsql.org/doc/ for further information.
+
+**This will require osm2pgsql version 1.7.0 or newer!**
 
 ```
 osm2pgsql -G -O flex -d osm -S openstreetmap-carto-hstore-only-l10n.lua planet.osm.pbf
 ```
-
-At the time of writing this requires the current master branch of osm2pgsql
-which will include the most recent changes to the flex backend.
-
-Version 1.6.0 or older are not recent enough!
