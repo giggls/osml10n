@@ -34,6 +34,13 @@ pip install pinyin_jyutping_sentence
 
 Might need to use ``pip3`` instead of ``pip`` in older versions of Debin/Ubuntu.
 
+Unfortunately these libraries (especially tltk) seem to be a somewhat
+moving target.  Thus here are the versions this code has been tested with:
+
+* pykakasi 2.2.1
+* tltk 1.6.3
+* pinyin_jyutping_sentence 1.3
+
 ## Installation
 
 On **Debian/Ubuntu** just call ``make deb`` after installing Python and Lua
