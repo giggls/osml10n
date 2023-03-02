@@ -41,9 +41,7 @@ try:
   import tltk
 
   # Cantonese transcription
-  with open(os.devnull, 'w') as fnull:
-    with contextlib.redirect_stderr(fnull) as err, contextlib.redirect_stdout(fnull) as out:
-      import pinyin_jyutping_sentence
+  import pinyin_jyutping_sentence
 except:
   sys.stderr.write("\nERROR: unable to load required python modules, please install them as follows:\n")
   sys.stderr.write("pip install pykakasi\npip install tltk\npip install pinyin_jyutping_sentence\n\n")
