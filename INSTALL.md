@@ -35,11 +35,20 @@ pip install pinyin_jyutping_sentence
 Might need to use ``pip3`` instead of ``pip`` in older versions of Debin/Ubuntu.
 
 Unfortunately these libraries (especially tltk) seem to be a somewhat
-moving target.  Thus here are the versions this code has been tested with:
+moving target.  Here are the versions this code has been tested with:
 
 * pykakasi 2.2.1
 * tltk 1.6.3
 * pinyin_jyutping_sentence 1.3
+
+Thus if this stuff does not work try the following instead of the above pip
+calls:
+
+```
+pip install pykakasi==2.2.1
+pip install tltk==1.6.3
+pip install pinyin_jyutping_sentence==1.3
+```
 
 ## Installation
 
@@ -50,13 +59,19 @@ To do this the ``dpkg-dev`` package has to be installed.
 ``dpkg-buildpackage`` might complain about further dependencies in this
 process. Just install them as requested in this case.
 
-This will give you two Debian packages which can be installed on the system.
+This will give you two Debian packages which should to be installed on the
+system:
+
+```
+dpkg -i lua-unaccent_*.deb
+dpkg -i ../osml10n_*_all.deb
+```
 
 To test if your installation is working as expected call ``make test``
 afterwards.
 
-Make sure that the transcription-daemon is running while running tests (will
-auto-start after the Debian packages have been installed).
+**Make sure that the transcription-daemon is running while running tests**
+(will auto-start after the Debian packages have been installed).
 
 If you get errors while calling ``make test`` please report them on Github.
 
