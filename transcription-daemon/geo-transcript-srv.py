@@ -36,15 +36,28 @@ import unicodedata
 try:
   # Kanji in JP
   import pykakasi
+except Exception as ex:
+  sys.stderr.write("\nERROR: unable to load python module pykakasi! Probably the following command will work:\n")
+  sys.stderr.write("pip install pykakasi\n\n")
+  sys.stderr.write("Error message was:\n%s\n" % ex)
+  sys.exit(1)
 
+try:
   # thai language in TH
   import tltk
+except Exception as ex:
+  sys.stderr.write("\nERROR: unable to load python module tltk! Probably the following command will work:\n")
+  sys.stderr.write("pip install tltk\n\n")
+  sys.stderr.write("Error message was:\n%s\n" % ex)
+  sys.exit(1)
 
+try:
   # Cantonese transcription
   import pinyin_jyutping_sentence
-except:
-  sys.stderr.write("\nERROR: unable to load required python modules, please install them as follows:\n")
-  sys.stderr.write("pip install pykakasi\npip install tltk\npip install pinyin_jyutping_sentence\n\n")
+except Exception as ex:
+  sys.stderr.write("\nERROR: unable to load python module pinyin_jyutping_sentence! Probably the following command will work:\n")
+  sys.stderr.write("pip install pinyin_jyutping_sentence\n\n")
+  sys.stderr.write("Error message was:\n%s\n" % ex)
   sys.exit(1)
 
 def split_by_alphabet(str):

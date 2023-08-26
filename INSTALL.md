@@ -4,7 +4,7 @@ Currently Openstreetmap l10n uses the **Python** as well as **Lua**
 programming language which unfortunatelly somewhat complicates the
 installation procedure.
 
-On Debian/Ubuntu (Currently tested on Debian 11) the most easy path for
+On Debian/Ubuntu (Currently tested on Debian 12) the most easy path for
 installation is as follows:
 
 ## Prerequisites
@@ -25,20 +25,22 @@ them with native Lua patterns.
 ### Python
 
 ```
-apt install python3-icu python3-shapely python3-pip python3-sdnotify python3-requests
+apt install python3-icu python3-shapely python3-pip python3-sdnotify python3-requests python3-sklearn
 
-pip install pykakasi
-pip install tltk
-pip install pinyin_jyutping_sentence
+pip install pykakasi -U --break-system-packages
+pip install tltk -U --break-system-packages
+pip install pinyin_jyutping_sentence -U --break-system-packages
 ```
 
-Might need to use ``pip3`` instead of ``pip`` in older versions of Debin/Ubuntu.
+I will need to find out how to get rid of this somewhat missleading
+"break-system-packages" option. It won't break anything because these
+packages are not available as Debian packages.
 
 Unfortunately these libraries (especially tltk) seem to be a somewhat
 moving target.  Here are the versions this code has been tested with:
 
 * pykakasi 2.2.1
-* tltk 1.6.3
+* tltk 1.6.8
 * pinyin_jyutping_sentence 1.3
 
 Thus if this stuff does not work try the following instead of the above pip
@@ -46,7 +48,7 @@ calls:
 
 ```
 pip install pykakasi==2.2.1
-pip install tltk==1.6.3
+pip install tltk==1.6.8
 pip install pinyin_jyutping_sentence==1.3
 ```
 

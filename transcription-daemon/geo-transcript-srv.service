@@ -9,7 +9,6 @@ Type=notify
 NotifyAccess=all
 User=nobody
 Group=nogroup
-StandardError=null
 
 ExecStart=/usr/local/bin/geo-transcript-srv.py -s -g /usr/local/share/osml10n/boundaries
 # Max number of open files
