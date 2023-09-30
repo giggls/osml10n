@@ -1,7 +1,5 @@
 local osml10n = {}
 
-local rex = require "rex_pcre"
-
 -- all available abbrev functions
 local abbrev_func_all = {}
 
@@ -57,54 +55,67 @@ abbrev_func_all.de = function(longname)
 end
 
 -- replaces some common parts of English street names with their abbreviation
+-- Mostly based on https://www.ponderweasel.com/whats-the-difference-between-an-ave-rd-st-ln-dr-way-pl-blvd-etc/
 abbrev_func_all.en = function(longname)
   local abbrev = longname
   -- Avenue is a special case because we must try to exclude french names
   local pos = string.find(abbrev,'Avenue')
   if ((pos ~= nil) and (pos >1)) then
-     if rex.match(abbrev, '^1[eè]?re Avenue\\b') == nil then
-       if rex.match(abbrev, '^[0-9]+e Avenue\\b') == nil then
-         abbrev=rex.gsub(abbrev,'(?!^)Avenue\\b','Ave.');
+     if string.match(abbrev, '^1[eè]?re Avenue%f[%A]') == nil then
+       if string.match(abbrev, '^[0-9]+e Avenue%f[%A]') == nil then
+         -- simulate negative lookahead
+         if not string.match(abbrev,'^Avenue') then
+           abbrev=string.gsub(abbrev,'Avenue%f[%A]','Ave.');
+         end
        end
      end
   end
+  
+  -- Do not shorten strings staring with Boulevard
   pos = string.find(abbrev,'Boulevard')
   if ((pos ~= nil) and (pos >1)) then
-    abbrev=rex.gsub(abbrev,'(?!^)Boulevard\\b','Blvd.');
-  end
-
-  match = rex.match(abbrev, '(Crescent|Court|Drive|Lane|Place|Road|Street|Square|Expressway|Freeway)\\b')
-  if (match ~= nil) then
-    if (match == 'Crescent') then abbrev = string.gsub(abbrev,'Crescent','Cres.') end
-    if (match == 'Court') then abbrev = string.gsub(abbrev,'Court','Ct') end
-    if (match == 'Drive') then abbrev = string.gsub(abbrev,'Drive','Dr.') end
-    if (match == 'Lane') then abbrev = string.gsub(abbrev,'Lane','') end
-    if (match == 'Place') then abbrev = string.gsub(abbrev,'Place','Pl.') end
-    if (match == 'Road') then abbrev = string.gsub(abbrev,'Road','Rd.') end
-    if (match == 'Street') then abbrev = string.gsub(abbrev,'Street','St.') end
-    if (match == 'Square') then abbrev = string.gsub(abbrev,'Square','Sq.') end
-
-    if (match == 'Expressway') then abbrev = string.gsub(abbrev,'Expressway','Expy') end
-    if (match == 'Freeway') then abbrev = string.gsub(abbrev,'Freeway','Fwy') end
+    abbrev=string.gsub(abbrev,'Boulevard%f[%A]','Blvd.');
   end
 
   -- Parkway Drive should be Parkway Dr. not "Pkwy Dr."
   pos = string.find(abbrev,'Parkway')
   if ((pos ~= nil) and (pos >1)) then
-    abbrev = rex.gsub(abbrev,"Parkway\\b", "Pkwy")
+    abbrev = string.gsub(abbrev,"Parkway%f[%A]", "Pkwy.")
   end
 
-  match = rex.match(abbrev, '(North|South|West|East|Northwest|Northeast|Southwest|Southeast)\\b')
-  if (match ~= nil) then
-    if (match == 'North') then abbrev = string.gsub(abbrev,'North','N') end
-    if (match == 'South') then abbrev = string.gsub(abbrev,'South','S') end
-    if (match == 'West') then abbrev = string.gsub(abbrev,'West','W') end
-    if (match == 'East') then abbrev = string.gsub(abbrev,'East','E') end
-    if (match == 'Northwest') then abbrev = string.gsub(abbrev,'Northwest','NW') end
-    if (match == 'Northeast') then abbrev = string.gsub(abbrev,'Northeast','NE') end
-    if (match == 'Southwest') then abbrev = string.gsub(abbrev,'Southwest','SW') end
-    if (match == 'Southeast') then abbrev = string.gsub(abbrev,'Southeast','SE') end
-  end
+  for _,obj in ipairs({
+    {'Street%f[%A]','St.'},
+    {'Road%f[%A]','Rd.'},
+    {'Drive%f[%A]','Dr.'},
+    {'Lane%f[%A]','Ln.'},
+    {'Place%f[%A]','Pl.'},
+    {'Square%f[%A]','Sq.'},
+    {'Crescent%f[%A]','Cres.'},
+    {'Court%f[%A]','Ct.'},
+    {'Expressway%f[%A]','Expy.'},
+    {'Freeway%f[%A]','Fwy.'}}) do
+    local a = string.gsub(abbrev,obj[1], obj[2])
+    if a ~= abbrev then
+     abbrev = a
+     break
+    end
+  end 
+
+  for _,obj in ipairs({
+    {'North%f[%A]','N'},
+    {'South%f[%A]','S'},
+    {'West%f[%A]','W'},
+    {'East%f[%A]','E'},
+    {'Nortwest%f[%A]','NW'},
+    {'Northeast%f[%A]','NE'},
+    {'Southwest%f[%A]','SW'},
+    {'Southeast%f[%A]','SE'}}) do
+    local a = string.gsub(abbrev,obj[1], obj[2])
+    if a ~= abbrev then
+     abbrev = a
+     break
+    end
+  end 
 
   return abbrev
 end
@@ -117,22 +128,26 @@ abbrev_func_all.fr = function(longname)
   -- also Normalize ^1ere, ^1re, ^1e to 1re
   local pos = string.find(abbrev,'Avenue')
   if ((pos ~= nil) and (pos >1)) then
-    abbrev = rex.gsub(abbrev, '^1([eè]?r?)e Avenue\\b','1re Av.')
-    abbrev = rex.gsub(abbrev, '^([0-9]+)e Avenue\\b','%1e Av.')
+    abbrev = string.gsub(abbrev, '^1([eè]?r?)e Avenue%f[%A]','1re Av.')
+    abbrev = string.gsub(abbrev, '^([0-9]+)e Avenue%f[%A]','%1e Av.')
   end
-
-  match = rex.match(abbrev, '^(Avenue|Boulevard|Chemin|Esplanade|Impasse|Passage|Promenade|Route|Ruelle|Sentier)\\b')
-  if (match ~= nil) then
-    if (match == 'Avenue') then abbrev = string.gsub(abbrev,'Avenue','Av.') end
-    if (match == 'Boulevard') then abbrev = string.gsub(abbrev,'Boulevard','Bd') end
-    if (match == 'Chemin') then abbrev = string.gsub(abbrev,'Chemin','Ch.') end
-    if (match == 'Esplanade') then abbrev = string.gsub(abbrev,'Esplanade','Espl.') end
-    if (match == 'Impasse') then abbrev = string.gsub(abbrev,'Impasse','Imp.') end
-    if (match == 'Passage') then abbrev = string.gsub(abbrev,'Passage','Pass.') end
-    if (match == 'Promenade') then abbrev = string.gsub(abbrev,'Promenade','Prom.') end
-    if (match == 'Route') then abbrev = string.gsub(abbrev,'Route','Rte') end
-    if (match == 'Ruelle') then abbrev = string.gsub(abbrev,'Ruelle','Rle') end
-    if (match == 'Sentier') then abbrev = string.gsub(abbrev,'Sentier','Sent.') end
+  
+  for _,obj in ipairs({
+    {'^Avenue%f[%A]','Av.'},
+    {'^Boulevard%f[%A]','Bd'},
+    {'^Chemin%f[%A]','Ch.'},
+    {'^Esplanade%f[%A]','Espl.'},
+    {'^Impasse%f[%A]','Imp.'},
+    {'^Passage%f[%A]','Pass.'},
+    {'^Promenade%f[%A]','Prom.'},
+    {'^Route%f[%A]','Rte'},
+    {'^Ruelle%f[%A]','Rle'},
+    {'^Sentier%f[%A]','Sent.'}}) do
+    local a = string.gsub(abbrev,obj[1], obj[2])
+    if a ~= abbrev then
+     abbrev = a
+     break
+    end
   end
 
   return abbrev

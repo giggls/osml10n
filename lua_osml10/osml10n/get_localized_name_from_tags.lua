@@ -4,7 +4,6 @@ local osml10n = {}
 local sabbrev = require "osml10n.street_abbrev"
 local helpers = require "osml10n.helper_functions"
 local transcript = require "osml10n.geo_transcript"
-local rex = require "rex_pcre"
 
 -- set to true to enable debug output of langage selection state machine 
 local debugoutput = false
@@ -142,9 +141,13 @@ function osml10n.gen_combined_names(local_tag, tags, localized_name_last, is_str
   found = false;
   pos = string.find(unacc,unacc_local:gsub("%W", "%%%1"))
 
+  -- replace lua magic characters,
+  local escaped_unacc_local = string.gsub(unacc_local, '[.]', '::')
+  escaped_unacc_local = string.gsub(escaped_unacc_local, '[][()%%+*?^$]', '@')
+
   -- ignore localized_name_last option if localized_name_last is specified but our localized
   -- name is on position 1 in generic name tag.
-  pos=rex.find(' ' .. unacc .. ' ', '[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_local .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]')
+  pos=string.find(' ' .. unacc .. ' ', '[][%s()-,;:/]' .. escaped_unacc_local .. '[][%s()-,;:/]')
   if ((pos == 1) and localized_name_last)then
     dbgprint("forcing localized_name_last=false")
     localized_name_last=false
@@ -181,8 +184,10 @@ function osml10n.gen_combined_names(local_tag, tags, localized_name_last, is_str
       
       for _,tag in ipairs(lang_names) do
 	unacc_tag = unaccent.unaccent(tags[tag])
+	local escaped_unacc_tag = string.gsub(unacc_tag, '[.]', '::')
+	escaped_unacc_tag = string.gsub(escaped_unacc_tag, '[][()%%+*?^$]', '@')
 	if (unacc_tag ~= unacc_local) then
-	  local utag_pos=rex.find(' ' .. unacc .. ' ','[\\s\\(\\)\\-,;:/\\[\\]](\\Q' .. unacc_tag .. '\\E)[\\s\\(\\)\\-,;:/\\[\\]]')
+	  local utag_pos=string.find(' ' .. unacc .. ' ','[][%s()-,;:/]' .. escaped_unacc_tag .. '[][%s()-,;:/]')
 	  if (utag_pos  ~= nil) then
 	    tmp_names[utag_pos]=tag
 	    dbgprint('found additional name ' .. tag .. ' (' .. tags[tag] .. ')');

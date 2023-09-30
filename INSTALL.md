@@ -14,9 +14,7 @@ installation is as follows:
 **This code will not work with lua versions below 5.3!**
 
 ```
-apt install libunac1-dev luarocks lua5.3 libpcre3-dev liblua5.3-dev
-
-luarocks install lrexlib-pcre
+apt install libunac1-dev luarocks lua5.3 liblua5.3-dev
 ```
 
 We hope to get rid of lrexlib-pcre in future versions of this code replacing
