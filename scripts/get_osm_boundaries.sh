@@ -10,7 +10,7 @@ get_osm_boundary_by_id() {
     local name="$1"
     local id="$2"
 
-    wget -O "$name.osm" "https://www.openstreetmap.org/api/0.6/relation/$id/full"
+    wget -O "$name.osm" "https://api.openstreetmap.org/api/0.6/relation/$id/full"
 
     osmium getid --remove-tags --add-referenced "$name.osm" "r$id" --output-format=opl \
         | sed -e "s/ T[^ ]\+ / Ttype=multipolygon,cc=$name /" >"$name.opl"
