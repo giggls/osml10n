@@ -10,6 +10,7 @@ import shapely.geometry
 import shapely.prepared
 import struct
 import sys
+import pkg_resources
 
 # as imports are very slow parse arguments first
 parser = argparse.ArgumentParser(description='Server for transcription of names based on geolocation')
@@ -17,7 +18,7 @@ parser.add_argument("-b", "--bindaddr", type=str, default="localhost", help="loc
 parser.add_argument("-p", "--port", default=8033, help="port to listen at")
 parser.add_argument('-s', '--sdnotify',  action='store_true', help='Signal systemd when daemon is ready to serve')
 parser.add_argument("-v", "--verbose", action='store_true', help="print verbose output")
-parser.add_argument('-g', '--geomdir', required=True, help='Directory with geometries')
+parser.add_argument('-g', '--geomdir', help='Directory with geometries')
 
 args = parser.parse_args()
 
@@ -26,7 +27,12 @@ def vout(msg):
     sys.stdout.write(msg)
     sys.stdout.flush()
 
-sys.stdout.write("Loading osml10n transcription server: ")
+try:
+  vers='version '+pkg_resources.require("osml10n")[0].version
+except:
+  vers='uninstalled version'
+
+sys.stdout.write("Loading osml10n transcription server (%s): " % vers)
 sys.stdout.flush()
 vout("\n")
 
@@ -169,10 +175,16 @@ class Coord2Country:
   @staticmethod
   def read_boundaries(dirname):
     features = []
-    for path in pathlib.Path(dirname).iterdir():
-      if path.is_file() and path.suffix == '.geojson':
-        with open(path) as f:
-          features.extend(json.load(f)["features"])
+    if dirname is None:
+      for path in pkg_resources.resource_listdir('osml10n','boundaries'):
+        if path.endswith('.geojson'):
+          f = pkg_resources.resource_string('osml10n','boundaries/' + path).decode('utf-8')
+          features.extend(json.loads(f)["features"])
+    else:
+      for path in pathlib.Path(dirname).iterdir():
+        if path.is_file() and path.suffix == '.geojson':
+          with open(path) as f:
+            features.extend(json.load(f)["features"])
     return features
 
   def __init__(self, dirname):

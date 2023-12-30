@@ -1,6 +1,5 @@
 [Unit]
 Description=OSM l10n transcription server
-ConditionPathIsDirectory=/usr/local/share/osml10n/boundaries
  
 [Service]
 TimeoutStartSec=0
@@ -10,7 +9,7 @@ NotifyAccess=all
 User=nobody
 Group=nogroup
 
-ExecStart=/usr/local/bin/geo-transcript-srv.py -s -g /usr/local/share/osml10n/boundaries
+ExecStart=/usr/local/osml10n/bin/geo-transcript-srv.py -s
 # Max number of open files
 LimitNOFILE=49152
 

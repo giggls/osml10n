@@ -5,19 +5,19 @@ prefix = /usr/local
 
 TARGETDIR=$(DESTDIR)$(prefix)
 
+PYTARGET=$(prefix)/osml10n
+
 build:
 	echo "These are lua and python scripts, there is nothing to build here"
 
-install: install-lua install-daemon
+install: install-lua
 
 install-daemon: systemd-service
-	mkdir -p $(TARGETDIR)/bin
-	cp -a transcription-daemon/geo-transcript-srv.py $(TARGETDIR)/bin
-	chmod 755 $(TARGETDIR)/bin/geo-transcript-srv.py
-	mkdir -p $(TARGETDIR)/share/osml10n/boundaries
-	cp -a boundaries/* $(TARGETDIR)/share/osml10n/boundaries
-	cp transcription-cli/transcribe.py $(TARGETDIR)/bin
-	chmod 755 $(TARGETDIR)/bin/transcribe.py
+	python -m venv $(PYTARGET)
+	$(PYTARGET)/bin/pip install pykakasi
+	$(PYTARGET)/bin/pip install tltk
+	$(PYTARGET)/bin/pip install pinyin_jyutping_sentence
+	$(PYTARGET)/bin/pip install .
 
 install-lua:
 	mkdir -p $(TARGETDIR)/share/lua/$(LUAV)
@@ -25,12 +25,12 @@ install-lua:
 	chmod -R go+rX $(TARGETDIR)/share/lua/$(LUAV)/osml10n
 
 systemd-service:
-	sed -e 's;/usr/local;/usr;g' transcription-daemon/geo-transcript-srv.service >debian/osml10n.service
+	cp transcription-daemon/geo-transcript-srv.service /etc/systemd/system/osml10n.service
 
 test:
 	cd lua_osml10/tests/ && ./runtests.lua
 
-deb: systemd-service
+deb:
 	dpkg-buildpackage -b -uc
 
 clean:

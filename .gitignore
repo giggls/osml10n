@@ -7,3 +7,5 @@ debian/debhelper-build-stamp
 debian/.debhelper/
 debian/*.substvars
 debian/files
+build
+*.egg-info

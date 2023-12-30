@@ -17,37 +17,10 @@ installation is as follows:
 apt install libunac1-dev luarocks lua5.3 liblua5.3-dev
 ```
 
-We hope to get rid of lrexlib-pcre in future versions of this code replacing
-them with native Lua patterns.
-
 ### Python
 
 ```
-apt install python3-icu python3-shapely python3-pip python3-sdnotify python3-requests python3-sklearn
-
-pip install pykakasi -U --break-system-packages
-pip install tltk -U --break-system-packages
-pip install pinyin_jyutping_sentence -U --break-system-packages
-```
-
-I will need to find out how to get rid of this somewhat missleading
-"break-system-packages" option. It won't break anything because these
-packages are not available as Debian packages.
-
-Unfortunately these libraries (especially tltk) seem to be a somewhat
-moving target.  Here are the versions this code has been tested with:
-
-* pykakasi 2.2.1
-* tltk 1.6.8
-* pinyin_jyutping_sentence 1.3
-
-Thus if this stuff does not work try the following instead of the above pip
-calls:
-
-```
-pip install pykakasi==2.2.1
-pip install tltk==1.6.8
-pip install pinyin_jyutping_sentence==1.3
+apt install python3.11-venv python3-sdnotify python3-shapely
 ```
 
 ## Installation
@@ -63,15 +36,24 @@ This will give you two Debian packages which should to be installed on the
 system:
 
 ```
-dpkg -i lua-unaccent_*.deb
-dpkg -i ../osml10n_*_all.deb
+sudo dpkg -i lua-unaccent_*.deb
+sudo dpkg -i ../osml10n_*_all.deb
+```
+
+Afterwards python stuff needs to be installed using pip and venv. Using sudo
+this will install all required stuff into /usr/local/osml10n and copy the
+systemd service file into /etc/systemd/system and enable it:
+
+
+```
+sudo make install-daemon
 ```
 
 To test if your installation is working as expected call ``make test``
 afterwards.
 
-**Make sure that the transcription-daemon is running while running tests**
-(will auto-start after the Debian packages have been installed).
+**Make sure that the transcription-daemon is running while running tests
+(``systemctl start osml10n``)**
 
 If you get errors while calling ``make test`` please report them on Github.
 
