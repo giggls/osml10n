@@ -71,5 +71,5 @@ Have a look at https://osm2pgsql.org/doc/ for further information.
 **This will require osm2pgsql version 1.7.0 or newer!**
 
 ```
-osm2pgsql -G -O flex -d osm -S openstreetmap-carto-hstore-only-l10n.lua planet.osm.pbf
+osm2pgsql -G -s -O flex -d osm -S openstreetmap-carto-hstore-only-l10n.lua planet.osm.pbf
 ```
