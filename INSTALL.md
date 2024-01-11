@@ -14,13 +14,13 @@ installation is as follows:
 **This code will not work with lua versions below 5.3!**
 
 ```
-apt install libunac1-dev luarocks lua5.3 liblua5.3-dev
+apt install libunac1-dev luarocks lua5.3 liblua5.3-dev build-essential debhelper
 ```
 
 ### Python
 
 ```
-apt install python3.11-venv python3-sdnotify python3-shapely
+apt install python3-venv python3-sdnotify python3-shapely libicu-dev libpython3-dev
 ```
 
 ## Installation

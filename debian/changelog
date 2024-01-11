@@ -1,3 +1,9 @@
+osml10n (1.1.1) unstable; urgency=medium
+
+  * Fix python installation
+
+ -- Sven Geggus <sven-debian@geggus.net>  Thu, 11 Jan 2024 11:40:55 +0100
+
 osml10n (1.1.0) unstable; urgency=medium
 
   * Remove python daemon from Debian package

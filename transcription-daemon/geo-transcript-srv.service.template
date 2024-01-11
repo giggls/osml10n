@@ -9,7 +9,7 @@ NotifyAccess=all
 User=nobody
 Group=nogroup
 
-ExecStart=/usr/local/osml10n/bin/geo-transcript-srv.py -s
+ExecStart=%PYTARGET%/bin/geo-transcript-srv.py -s
 # Max number of open files
 LimitNOFILE=49152
 

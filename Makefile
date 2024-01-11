@@ -13,10 +13,7 @@ build:
 install: install-lua
 
 install-daemon: systemd-service
-	python -m venv $(PYTARGET)
-	$(PYTARGET)/bin/pip install pykakasi
-	$(PYTARGET)/bin/pip install tltk
-	$(PYTARGET)/bin/pip install pinyin_jyutping_sentence
+	python3 -m venv $(PYTARGET)
 	$(PYTARGET)/bin/pip install .
 
 install-lua:
@@ -25,7 +22,7 @@ install-lua:
 	chmod -R go+rX $(TARGETDIR)/share/lua/$(LUAV)/osml10n
 
 systemd-service:
-	cp transcription-daemon/geo-transcript-srv.service /etc/systemd/system/osml10n.service
+	sed -e "s;%PYTARGET%;$(PYTARGET);g" transcription-daemon/geo-transcript-srv.service.template >/etc/systemd/system/osml10n.service
 
 test:
 	cd lua_osml10/tests/ && ./runtests.lua
