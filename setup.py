@@ -21,15 +21,15 @@ setup(
     name='osml10n',
     version=vers,
     install_requires=[
-        f"sklearn @ file://localhost/{PROJECT_DIR}/deps/sklearn-0.0.post9.tar.gz",
-        "scikit-learn == 1.3.0", 
+        "scikit-learn == 1.3.2", 
         "pykakasi == 2.2.1",
-        "tltk == 1.6.8",
+        "tltk == 1.8.0",
         "pinyin_jyutping_sentence == 1.3",
         "pyicu",
         "shapely",
         "sdnotify",
-        "requests"
+        "requests",
+        "pandas"
     ],
     scripts = [ "transcription-daemon/geo-transcript-srv.py", "transcription-cli/transcribe.py" ],
     packages = [ "osml10n" ],

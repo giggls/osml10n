@@ -11,6 +11,7 @@ import shapely.prepared
 import struct
 import sys
 import pkg_resources
+from importlib.metadata import version
 
 # as imports are very slow parse arguments first
 parser = argparse.ArgumentParser(description='Server for transcription of names based on geolocation')
@@ -31,6 +32,8 @@ try:
   vers='version '+pkg_resources.require("osml10n")[0].version
 except:
   vers='uninstalled version'
+  if (args.geomdir == None):
+    args.geomdir = os.path.join('osml10n','boundaries')
 
 sys.stdout.write("Loading osml10n transcription server (%s): " % vers)
 sys.stdout.flush()
@@ -290,7 +293,7 @@ async def main():
     await server.serve_forever()
 
 if __name__ == "__main__":
-  sys.stdout.write("ready.\n")
+  sys.stdout.write("ready.\n(using pykakasi "+version('pykakasi')+', '+"tltk "+version('tltk')+', '+"pinyin_jyutping_sentence "+version('pinyin_jyutping_sentence')+')\n')
   if args.sdnotify:
     import sdnotify
     sdnotify.SystemdNotifier().notify("READY=1")

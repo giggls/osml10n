@@ -1,3 +1,10 @@
+osml10n (1.2.0) unstable; urgency=medium
+
+  * get rid of deprecated sklearn package
+  * Update to tltk 1.8
+
+ -- Sven Geggus <sven-debian@geggus.net>  Sun, 14 Jan 2024 13:17:08 +0100
+
 osml10n (1.1.1) unstable; urgency=medium
 
   * Fix python installation
