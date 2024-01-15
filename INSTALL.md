@@ -32,7 +32,7 @@ To do this the ``dpkg-dev`` package has to be installed.
 ``dpkg-buildpackage`` might complain about further dependencies in this
 process. Just install them as requested in this case.
 
-This will give you two Debian packages which should to be installed on the
+This will give you two Debian packages which should be installed on the
 system:
 
 ```
