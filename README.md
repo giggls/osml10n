@@ -19,7 +19,7 @@ does.
 However already back in 2019 this approach started to show a couple of
 limitations which led to the decision to relocate the transcription stuff
 into data procession stage (database import or Openstreetmap file
-processiong), which is what this code does.
+processing), which is what this code does.
 
 ## Implementation
 
