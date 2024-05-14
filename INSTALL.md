@@ -64,7 +64,8 @@ them myself.
 ## Rendering a l10n version of Openstreetmap Carto
 
 If you inted to use this code for rendering a localized version of Openstreetmap Carto
-calling osm2pgsql as follows should work.
+calling osm2pgsql as follows should work (on a machine also running the
+**transcription-daemon**):
 
 Have a look at https://osm2pgsql.org/doc/ for further information.
 
