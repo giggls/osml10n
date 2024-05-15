@@ -1,0 +1,25 @@
+name: Build OCI image
+
+on:
+  push:
+    branches: ["main", "master"]
+
+jobs:
+  build:
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout ${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build with docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
