@@ -1,6 +1,6 @@
 [Unit]
 Description=OSM l10n transcription server
- 
+
 [Service]
 TimeoutStartSec=0
 Restart=always

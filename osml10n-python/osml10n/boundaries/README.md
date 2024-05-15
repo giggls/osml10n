@@ -7,4 +7,3 @@ from OSM data with the script `get_osm_boundaries.sh`. The script needs
 
 The boundaries must be in GeoJSON format with a property `cc` containing the
 ISO country code.
-
