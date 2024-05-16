@@ -7,8 +7,8 @@ import unicodedata
 import json
 import os
 import pathlib
-import shapely.geometry
-import shapely.prepared
+from shapely import geometry
+from shapely import prepared
 import struct
 import sys
 from importlib.metadata import version
@@ -220,16 +220,16 @@ class Coord2Country:
         features = self.read_boundaries(dirname)
         boundaries = []
         for feature in features:
-            geom = shapely.geometry.shape(feature["geometry"])
+            geom = geometry.shape(feature["geometry"])
             cc = feature["properties"]["cc"]
             boundaries.append(cc)
-            self.features.append([shapely.prepared.prep(geom), cc])
+            self.features.append([prepared.prep(geom), cc])
         vout(f"Found boundaries: {boundaries}")
 
     def getCountry(self, id, lon, lat):
         if lon == "" or lat == "":
             return ""
-        p = shapely.geometry.Point(float(lon), float(lat))
+        p = geometry.Point(float(lon), float(lat))
         for f in self.features:
             if f[0].contains(p):
                 country = f[1]
