@@ -44,7 +44,7 @@ try:
     vers = "version " + pkg_resources.require("osml10n")[0].version
 except:
     vers = "uninstalled version"
-    if args.geomdir == None:
+    if args.geomdir is None:
         args.geomdir = os.path.join("osml10n", "boundaries")
 
 sys.stdout.write("Loading osml10n transcription server (%s): " % vers)
