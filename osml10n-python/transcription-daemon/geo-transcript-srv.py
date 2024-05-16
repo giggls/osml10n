@@ -2,6 +2,8 @@
 
 import argparse
 import asyncio
+import icu
+import unicodedata
 import json
 import os
 import pathlib
@@ -49,8 +51,6 @@ sys.stdout.write("Loading osml10n transcription server (%s): " % vers)
 sys.stdout.flush()
 vout("\n")
 
-import icu
-import unicodedata
 
 try:
     # Kanji in JP
