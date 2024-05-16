@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # generate lua Table from http://wiki.openstreetmap.org/wiki/Nominatim/Country_Codes
 
