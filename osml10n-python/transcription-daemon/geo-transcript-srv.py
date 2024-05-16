@@ -112,7 +112,7 @@ def thai_transcript(inpstr):
             transcript = ""
             try:
                 transcript = tltk.nlp.th2roman(st).rstrip("<s/>").rstrip()
-            except:
+            except Exception:
                 sys.stderr.write("tltk error transcribing >%s<\n" % st)
                 return None
             latin = latin + transcript
@@ -130,7 +130,7 @@ def cantonese_transcript(inpstr):
             transcript = ""
             try:
                 transcript = pinyin_jyutping_sentence.jyutping(st, spaces=True)
-            except:
+            except Exception:
                 sys.stderr.write(
                     "pinyin_jyutping_sentence error transcribing >%s<\n" % st
                 )
