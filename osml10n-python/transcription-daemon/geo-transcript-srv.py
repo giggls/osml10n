@@ -11,8 +11,8 @@ import shapely.geometry
 import shapely.prepared
 import struct
 import sys
-import pkg_resources
 from importlib.metadata import version
+from importlib.resources import files
 
 # as imports are very slow parse arguments first
 parser = argparse.ArgumentParser(
@@ -40,9 +40,8 @@ def vout(msg):
         sys.stdout.flush()
 
 
-try:
-    vers = "version " + pkg_resources.require("osml10n")[0].version
-except:
+vers = "version " + version("osml10n")
+if vers is None:
     vers = "uninstalled version"
     if args.geomdir is None:
         args.geomdir = os.path.join("osml10n", "boundaries")
@@ -206,11 +205,9 @@ class Coord2Country:
     def read_boundaries(dirname):
         features = []
         if dirname is None:
-            for path in pkg_resources.resource_listdir("osml10n", "boundaries"):
-                if path.endswith(".geojson"):
-                    f = pkg_resources.resource_string(
-                        "osml10n", "boundaries/" + path
-                    ).decode("utf-8")
+            for path in files("osml10n.boundaries").iterdir():
+                if path.name.endswith(".geojson"):
+                    f = path.read_bytes().decode("utf-8")
                     features.extend(json.loads(f)["features"])
         else:
             for path in pathlib.Path(dirname).iterdir():
