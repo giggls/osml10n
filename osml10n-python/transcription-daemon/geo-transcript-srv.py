@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import icu
+import logging
 import unicodedata
 import json
 import os
@@ -33,12 +34,10 @@ parser.add_argument("-g", "--geomdir", help="Directory with geometries")
 
 args = parser.parse_args()
 
-
-def vout(msg):
-    if args.verbose:
-        sys.stdout.write(msg)
-        sys.stdout.flush()
-
+if args.verbose:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 vers = "version " + version("osml10n")
 if vers is None:
@@ -46,42 +45,40 @@ if vers is None:
     if args.geomdir is None:
         args.geomdir = os.path.join("osml10n", "boundaries")
 
-sys.stdout.write("Loading osml10n transcription server (%s): " % vers)
-sys.stdout.flush()
-vout("\n")
+logging.info("Loading osml10n transcription server (%s): " % vers)
 
 
 try:
     # Kanji in JP
     import pykakasi
 except Exception as ex:
-    sys.stderr.write(
+    logging.error(
         "\nERROR: unable to load python module pykakasi! Probably the following command will work:\n"
     )
-    sys.stderr.write("pip install pykakasi\n\n")
-    sys.stderr.write("Error message was:\n%s\n" % ex)
+    logging.error("pip install pykakasi\n\n")
+    logging.error("Error message was:\n%s\n" % ex)
     sys.exit(1)
 
 try:
     # thai language in TH
     import tltk
 except Exception as ex:
-    sys.stderr.write(
+    logging.error(
         "\nERROR: unable to load python module tltk! Probably the following command will work:\n"
     )
-    sys.stderr.write("pip install tltk\n\n")
-    sys.stderr.write("Error message was:\n%s\n" % ex)
+    logging.error("pip install tltk\n\n")
+    logging.error("Error message was:\n%s\n" % ex)
     sys.exit(1)
 
 try:
     # Cantonese transcription
     import pinyin_jyutping_sentence
 except Exception as ex:
-    sys.stderr.write(
+    logging.error(
         "\nERROR: unable to load python module pinyin_jyutping_sentence! Probably the following command will work:\n"
     )
-    sys.stderr.write("pip install pinyin_jyutping_sentence\n\n")
-    sys.stderr.write("Error message was:\n%s\n" % ex)
+    logging.error("pip install pinyin_jyutping_sentence\n\n")
+    logging.error("Error message was:\n%s\n" % ex)
     sys.exit(1)
 
 
@@ -112,7 +109,7 @@ def thai_transcript(inpstr):
             try:
                 transcript = tltk.nlp.th2roman(st).rstrip("<s/>").rstrip()
             except Exception:
-                sys.stderr.write("tltk error transcribing >%s<\n" % st)
+                logging.error("tltk error transcribing >%s<\n" % st)
                 return None
             latin = latin + transcript
         else:
@@ -130,9 +127,7 @@ def cantonese_transcript(inpstr):
             try:
                 transcript = pinyin_jyutping_sentence.jyutping(st, spaces=True)
             except Exception:
-                sys.stderr.write(
-                    "pinyin_jyutping_sentence error transcribing >%s<\n" % st
-                )
+                logging.error("pinyin_jyutping_sentence error transcribing >%s<\n" % st)
                 return None
             latin = latin + transcript
         else:
@@ -170,9 +165,11 @@ class transcriptor:
 
     def transcript(self, id, country, unistr):
         if country == "":
-            vout("doing transcription for >>%s<< (generic, osm_id %s)\n" % (unistr, id))
+            logging.debug(
+                "doing transcription for >>%s<< (generic, osm_id %s)\n" % (unistr, id)
+            )
         else:
-            vout(
+            logging.debug(
                 "doing transcription for >>%s<< (country %s, osm_id %s)\n"
                 % (unistr, country, id)
             )
@@ -224,7 +221,7 @@ class Coord2Country:
             cc = feature["properties"]["cc"]
             boundaries.append(cc)
             self.features.append([prepared.prep(geom), cc])
-        vout(f"Found boundaries: {boundaries}")
+        logging.debug(f"Found boundaries: {boundaries}")
 
     def getCountry(self, id, lon, lat):
         if lon == "" or lat == "":
@@ -233,9 +230,11 @@ class Coord2Country:
         for f in self.features:
             if f[0].contains(p):
                 country = f[1]
-                vout("country for %s/%s is %s (osm_id %s)\n" % (lon, lat, country, id))
+                logging.debug(
+                    "country for %s/%s is %s (osm_id %s)\n" % (lon, lat, country, id)
+                )
                 return f[1]
-        vout("country for %s/%s is unknown (osm_id %s)\n" % (lon, lat, id))
+        logging.debug("country for %s/%s is unknown (osm_id %s)\n" % (lon, lat, id))
         return ""
 
 
@@ -270,13 +269,13 @@ async def send_reply(writer, reply):
 
 
 async def handle_connection(reader, writer):
-    vout("New connection\n")
+    logging.debug("New connection\n")
     while True:
         id = "unknown"
         try:
             data = await read_request(reader)
             if data is None:
-                vout("Connection closed\n")
+                logging.debug("Connection closed\n")
                 return
 
             # We support the following formats:
@@ -296,7 +295,7 @@ async def handle_connection(reader, writer):
                     else:
                         cc = ""
             else:
-                sys.stderr.write(f"Ignore unkown command '{cmd}'\n")
+                logging.error(f"Ignore unkown command '{cmd}'\n")
                 await send_reply(writer, "")
                 continue
 
@@ -308,12 +307,12 @@ async def handle_connection(reader, writer):
             if isinstance(reply, str):
                 await send_reply(writer, reply)
             else:
-                sys.stderr.write(
+                logging.error(
                     f"Error in id '{id}': transcript('{cc}','{name}') returned non-string '{reply}'\n"
                 )
                 await send_reply(writer, "")
         except BaseException as err:
-            sys.stderr.write(f"Error in id '{id}': {err}, {type(err)}\n")
+            logging.error(f"Error in id '{id}': {err}, {type(err)}\n")
             await send_reply(writer, "")
 
 
@@ -326,14 +325,14 @@ async def main():
         reuse_port=True,
     )
     addrs = ", ".join(str(sock.getsockname()) for sock in server.sockets)
-    vout(f"Serving on {addrs}\n")
+    logging.debug(f"Serving on {addrs}\n")
 
     async with server:
         await server.serve_forever()
 
 
 if __name__ == "__main__":
-    sys.stdout.write(
+    logging.info(
         "ready.\n(using pykakasi "
         + version("pykakasi")
         + ", "
