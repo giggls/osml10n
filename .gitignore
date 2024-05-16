@@ -9,3 +9,4 @@ debian/*.substvars
 debian/files
 build
 *.egg-info
+.*-cache/
