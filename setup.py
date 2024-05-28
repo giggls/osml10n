@@ -29,7 +29,8 @@ setup(
         "shapely",
         "sdnotify",
         "requests",
-        "pandas"
+        "pandas",
+        "scipy<1.13",  # see https://github.com/piskvorky/gensim/issues/3525 (gensim is a transitive dep of tltk)
     ],
     scripts = [ "transcription-daemon/geo-transcript-srv.py", "transcription-cli/transcribe.py" ],
     packages = [ "osml10n" ],
