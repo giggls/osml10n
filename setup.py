@@ -21,7 +21,8 @@ setup(
     name='osml10n',
     version=vers,
     install_requires=[
-        "scikit-learn == 1.3.2", 
+        "scipy < 1.13.0",
+        "scikit-learn", 
         "pykakasi == 2.2.1",
         "tltk == 1.8.0",
         "pinyin_jyutping_sentence == 1.3",
