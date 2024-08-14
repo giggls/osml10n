@@ -50,7 +50,7 @@ col_definitions = {
         { column = 'tags', type = 'hstore' },
         { column = 'layer', type = 'int4' },
         { column = 'z_order', type = 'int4' },
-        { column = 'way_area', type = 'area' },
+        { column = 'way_area', type = 'real' },
         { column = 'name_l10n', sql_type = 'text[]'}
     },
     route = {
@@ -453,34 +453,80 @@ function split_tags(tags, tag_map)
     return cols
 end
 
-function add_line(tags, name_l10n)
+function add_line(tags, name_l10n, object)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
     cols['z_order'] = z_order(tags)
-    cols.way = { create = 'line', split_at = 100000 }
     cols.name_l10n = name_l10n
-    tables.line:add_row(cols)
+    local mgeom = object:as_linestring():transform(3857):segmentize(100000)
+    for sgeom in mgeom:geometries() do
+        cols.way = sgeom
+        tables.line:insert({ cols })
+    end
 end
 
-function add_roads(tags, name_l10n)
+function add_multiline(tags, name_l10n, object)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
     cols['z_order'] = z_order(tags)
-    cols.way = { create = 'line', split_at = 100000 }
     cols.name_l10n = name_l10n
-    tables.roads:add_row(cols)
+    local mgeom =  object:as_multilinestring():line_merge():transform(3857):segmentize(100000)
+    for sgeom in mgeom:geometries() do
+        cols.way = sgeom
+        tables.line:insert({ cols })
+    end
 end
 
-function add_polygon(tags, name_l10n)
+function add_roads(tags, name_l10n, object)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
     cols['z_order'] = z_order(tags)
-    cols.way = { create = 'area'}
     cols.name_l10n = name_l10n
-    tables.polygon:add_row(cols)
+    local mgeom = object:as_linestring():transform(3857):segmentize(100000)
+    for sgeom in mgeom:geometries() do
+        cols.way = sgeom
+        tables.roads:insert({ cols })
+    end
+end
+
+function add_multiroads(tags, name_l10n, object)
+    local cols = {}
+    cols.tags = tags
+    cols['layer'] = layer(tags['layer'])
+    cols['z_order'] = z_order(tags)
+    cols.name_l10n = name_l10n
+    local mgeom =  object:as_multilinestring():line_merge():transform(3857):segmentize(100000)
+    for sgeom in mgeom:geometries() do
+        cols.way = sgeom
+        tables.roads:insert({ cols })
+    end
+end
+
+function add_polygon(tags, name_l10n, object)
+    local cols = {}
+    cols.tags = tags
+    cols['layer'] = layer(tags['layer'])
+    cols['z_order'] = z_order(tags)
+    cols.name_l10n = name_l10n
+    local poly = object:as_polygon():transform(3857)
+    cols.way = poly
+    cols.area = poly:area()
+    tables.polygon:insert(cols)
+end
+
+function add_multipolygon(tags, name_l10n, object)
+    local cols = {}
+    cols.tags = tags
+    cols['layer'] = layer(tags['layer'])
+    cols['z_order'] = z_order(tags)
+    cols.name_l10n = name_l10n
+    local poly = object:as_multipolygon():transform(3857)
+    cols.way = poly
+    cols.area = poly:area()
+    tables.polygon:insert(cols)
 end
 
 function add_route(object)
@@ -489,7 +535,7 @@ function add_route(object)
             local cols = object.tags
             cols.member_id = member.ref
             cols.member_position = i
-            tables.route:add_row(cols)
+            tables.route:insert(cols)
         end
     end
 end
@@ -523,7 +569,7 @@ function osm2pgsql.process_node(object)
         name_l10n = table2escapedarray(names)
         if remove_names then remove_name_tags(object.tags) end
     end
-    tables.point:add_row({tags = object.tags, name_l10n = name_l10n})
+    tables.point:insert({tags = object.tags, name_l10n = name_l10n, way = object:as_point()})
 end
 
 function osm2pgsql.process_way(object)
@@ -539,7 +585,7 @@ function osm2pgsql.process_way(object)
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
-        add_polygon(object.tags, name_l10n)
+        add_polygon(object.tags, name_l10n, object)
     else
         -- on line/road use streetname function on highways
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
@@ -551,17 +597,15 @@ function osm2pgsql.process_way(object)
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
-        add_line(object.tags, name_l10n)
-
+        add_line(object.tags, name_l10n, object)
         if roads(object.tags) then
-            add_roads(object.tags, name_l10n)
+            add_roads(object.tags, name_l10n, object)
         end
     end
 end
 
 function osm2pgsql.process_relation(object)
     local names,languages,name_l10n
-    
     -- grab the type tag before filtering tags
     local type = object.tags.type
     object.tags.type = nil
@@ -569,9 +613,9 @@ function osm2pgsql.process_relation(object)
     if clean_tags(object.tags) then
         return
     end
-    
+
     if type == "boundary" or (type == "multipolygon" and object.tags["boundary"]) then
-    	-- add custom naming of countries because name is noit reliable
+    	-- add custom naming of countries because name is not reliable
     	if ((object.tags['admin_level'] == '2') and (object.tags['ISO3166-1:alpha2'] ~= nil)) then
     	    names = osml10n.get_country_name(object.tags, lang, true)
     	else
@@ -579,13 +623,13 @@ function osm2pgsql.process_relation(object)
     	end
     	name_l10n = table2escapedarray(names)
     	if remove_names then remove_name_tags(object.tags) end
-        add_line(object.tags, name_l10n)
+        add_multiline(object.tags, name_l10n, object)
 
         if roads(object.tags) then
-            add_roads(object.tags, name_l10n)
+            add_multiroads(object.tags, name_l10n, object)
         end
 
-        add_polygon(object.tags, name_l10n)
+        add_multipolygon(object.tags, name_l10n, object)
 
     elseif type == "multipolygon" then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
@@ -593,18 +637,18 @@ function osm2pgsql.process_relation(object)
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
-        add_polygon(object.tags, name_l10n)
+        add_multipolygon(object.tags, name_l10n, object)
     elseif type == "route" then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
             names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
-        add_line(object.tags, name_l10n)
+        add_multiline(object.tags, name_l10n, object)
         add_route(object)
         -- TODO: Remove this, roads tags don't belong on route relations
         if roads(object.tags) then
-            add_roads(object.tags, name_l10n)
+            add_multiroads(object.tags, name_l10n, object)
         end
     end
 end
