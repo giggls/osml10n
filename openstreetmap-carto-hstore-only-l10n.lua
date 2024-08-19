@@ -462,7 +462,7 @@ function add_line(tags, name_l10n, object)
     local mgeom = object:as_linestring():transform(3857):segmentize(100000)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
-        tables.line:insert({ cols })
+        tables.line:insert(cols)
     end
 end
 
@@ -475,7 +475,7 @@ function add_multiline(tags, name_l10n, object)
     local mgeom =  object:as_multilinestring():line_merge():transform(3857):segmentize(100000)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
-        tables.line:insert({ cols })
+        tables.line:insert(cols)
     end
 end
 
@@ -488,7 +488,7 @@ function add_roads(tags, name_l10n, object)
     local mgeom = object:as_linestring():transform(3857):segmentize(100000)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
-        tables.roads:insert({ cols })
+        tables.roads:insert(cols)
     end
 end
 
@@ -501,7 +501,7 @@ function add_multiroads(tags, name_l10n, object)
     local mgeom =  object:as_multilinestring():line_merge():transform(3857):segmentize(100000)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
-        tables.roads:insert({ cols })
+        tables.roads:insert(cols)
     end
 end
 
