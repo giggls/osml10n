@@ -439,6 +439,15 @@ function remove_name_tags(tags)
     return next(tags) == nil
 end
 
+local function create_cols(tags)
+    local cols = {}
+    cols.tags = tags
+    cols['layer'] = layer(tags['layer'])
+    cols['z_order'] = z_order(tags)
+    cols.name_l10n = name_l10n
+    return cols
+end
+
 --- Splits a tag into tags and hstore tags
 -- @return columns, hstore tags
 function split_tags(tags, tag_map)
@@ -454,11 +463,7 @@ function split_tags(tags, tag_map)
 end
 
 function add_line(tags, name_l10n, mgeom)
-    local cols = {}
-    cols.tags = tags
-    cols['layer'] = layer(tags['layer'])
-    cols['z_order'] = z_order(tags)
-    cols.name_l10n = name_l10n
+    local cols = create_cols(tags)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
         tables.line:insert(cols)
@@ -466,11 +471,7 @@ function add_line(tags, name_l10n, mgeom)
 end
 
 function add_roads(tags, name_l10n, mgeom)
-    local cols = {}
-    cols.tags = tags
-    cols['layer'] = layer(tags['layer'])
-    cols['z_order'] = z_order(tags)
-    cols.name_l10n = name_l10n
+    local cols = create_cols(tags)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
         tables.roads:insert(cols)
@@ -478,11 +479,7 @@ function add_roads(tags, name_l10n, mgeom)
 end
 
 function add_polygon(tags, name_l10n, poly)
-    local cols = {}
-    cols.tags = tags
-    cols['layer'] = layer(tags['layer'])
-    cols['z_order'] = z_order(tags)
-    cols.name_l10n = name_l10n
+    local cols = create_cols(tags)
     cols.way = poly
     cols.area = poly:area()
     tables.polygon:insert(cols)
