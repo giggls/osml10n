@@ -19,12 +19,7 @@ function osml10n.geo_transcript(id,name,bbox)
   if (bbox == nil) then
     reqbody = "CC/" .. id .. "/" .. "/" .. name
   else
-    if (type(bbox) == "function") then
-      bx[1], bx[2], bx[3], bx[4] = bbox()
-    -- assume bbox is table type otherwise
-    else
-      bx = bbox
-    end
+    bx[1], bx[2], bx[3], bx[4] = bbox:get_bbox()
     if (bx[1] ~= nil) then
       lon = (bx[1]+bx[3])/2.0
       lat = (bx[2]+bx[4])/2.0
