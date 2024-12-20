@@ -481,7 +481,7 @@ end
 function add_polygon(tags, name_l10n, poly)
     local cols = create_cols(tags)
     cols.way = poly
-    cols.area = poly:area()
+    cols.way_area = poly:area()
     tables.polygon:insert(cols)
 end
 
