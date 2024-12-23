@@ -439,7 +439,7 @@ function remove_name_tags(tags)
     return next(tags) == nil
 end
 
-local function create_cols(tags)
+local function create_cols(tags, name_l10n)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
@@ -463,7 +463,7 @@ function split_tags(tags, tag_map)
 end
 
 function add_line(tags, name_l10n, mgeom)
-    local cols = create_cols(tags)
+    local cols = create_cols(tags, name_l10n)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
         tables.line:insert(cols)
@@ -471,7 +471,7 @@ function add_line(tags, name_l10n, mgeom)
 end
 
 function add_roads(tags, name_l10n, mgeom)
-    local cols = create_cols(tags)
+    local cols = create_cols(tags, name_l10n)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
         tables.roads:insert(cols)
@@ -479,7 +479,7 @@ function add_roads(tags, name_l10n, mgeom)
 end
 
 function add_polygon(tags, name_l10n, poly)
-    local cols = create_cols(tags)
+    local cols = create_cols(tags, name_l10n)
     cols.way = poly
     cols.way_area = poly:area()
     tables.polygon:insert(cols)
