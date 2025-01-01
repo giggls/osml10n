@@ -5,6 +5,7 @@
 
 osml10n = require("osml10n")
 unaccent = require("unaccent")
+local osm2pgsql = require("osm2pgsql")
 
 -- Wtf? I really think that a simple tostring method as in python should be part of any data-type
 function hash2string(hash)
@@ -19,8 +20,14 @@ function hash2string(hash)
     else
       if (type(v) == "number") then
         string = string .. '["' .. k .. '"] = ' .. v .. ', '
-      else
+      elseif (type(v) == "string") then
         string = string .. '["' .. k .. '"] = "' .. v .. '", '
+      elseif (type(v) == "table") then
+        string = string .. '["' .. k .. '"] = ' .. hash2string(v) .. ', '
+      elseif (type(v) == "function") then
+        string = string .. '["' .. k .. '"] = function(), '
+      else
+        print(type(v))
       end
     end
   end
@@ -135,34 +142,34 @@ end
 -- geo_transcript function via external daemon
 
 -- Japan
-checkoutput(osml10n.geo_transcript,"geo_transcript","Toukyou",'42',"東京",{ 138.79, 36.08, 139.51, 36.77 })
-checkoutput(osml10n.geo_transcript,"geo_transcript","Kanji 100 abc",'42','漢字 100 abc',{ 138.79, 36.08, 139.51, 36.77 })
+checkoutput(osml10n.geo_transcript,"geo_transcript","Toukyou",'42',"東京",osm2pgsql.OSMObject:new("dummyName",0,{138.79, 36.08, 139.51, 36.77}))
+checkoutput(osml10n.geo_transcript,"geo_transcript","Kanji 100 abc",'42','漢字 100 abc',osm2pgsql.OSMObject:new("dummyName",0,{138.79, 36.08, 139.51, 36.77}))
 
 -- China
-checkoutput(osml10n.geo_transcript,"geo_transcript","dōng jīng",'42',"東京",{113.05, 29.45, 115.73, 32.13})
-checkoutput(osml10n.geo_transcript,"geo_transcript","hàn zì 100 abc",'42','漢字 100 abc',{113.05, 29.45, 115.73, 32.13})
+checkoutput(osml10n.geo_transcript,"geo_transcript","dōng jīng",'42',"東京",osm2pgsql.OSMObject:new("dummyName",0,{113.05, 29.45, 115.73, 32.13}))
+checkoutput(osml10n.geo_transcript,"geo_transcript","hàn zì 100 abc",'42','漢字 100 abc',osm2pgsql.OSMObject:new("dummyName",0,{113.05, 29.45, 115.73, 32.13}))
 -- international waters
-checkoutput(osml10n.geo_transcript,"geo_transcript","běi jīng",'42','北京',{-30, 49, -29, 50})
+checkoutput(osml10n.geo_transcript,"geo_transcript","běi jīng",'42','北京',osm2pgsql.OSMObject:new("dummyName",0,{-30, 49, -29, 50}))
 
 -- Thailand
-checkoutput(osml10n.geo_transcript,"geo_transcript","hongsamut prachachon",'42','ห้องสมุดประชาชน',{100, 14, 101, 15})
-checkoutput(osml10n.geo_transcript,"geo_transcript","thai thanon khaosan 100",'42','thai ถนนข้าวสาร 100',{100, 14, 101, 15})
-checkoutput(osml10n.geo_transcript,"geo_transcript","anusawari phraya ratsa da nu pradit",'42','อนุสาวรีย์พระยารัษฎาณุประดิษฐ์',{100, 14, 101, 15})
+checkoutput(osml10n.geo_transcript,"geo_transcript","hongsamut prachachon",'42','ห้องสมุดประชาชน',osm2pgsql.OSMObject:new("dummyName",0,{100, 14, 101, 15}))
+checkoutput(osml10n.geo_transcript,"geo_transcript","thai thanon khaosan 100",'42','thai ถนนข้าวสาร 100',osm2pgsql.OSMObject:new("dummyName",0,{100, 14, 101, 15}))
+checkoutput(osml10n.geo_transcript,"geo_transcript","anusawari phraya ratsa da nu pradit",'42','อนุสาวรีย์พระยารัษฎาณุประดิษฐ์',osm2pgsql.OSMObject:new("dummyName",0,{100, 14, 101, 15}))
 
 -- Macau
-checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港",{113.54, 22.16, 113.58, 22.2})
+checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港",osm2pgsql.OSMObject:new("dummyName",0,{113.54, 22.16, 113.58, 22.2}))
 
 -- Hongkong
-checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港",{114.15, 22.28, 114.2, 22.33})
+checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港",osm2pgsql.OSMObject:new("dummyName",0,{114.15, 22.28, 114.2, 22.33}))
 
 -- cyrillic nowhere and anywhere on the atlantic
-checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",nil)
+checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",osm2pgsql.OSMObject:new("dummyName",0,nil))
 -- international waters
-checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",{-30, 49, -29, 50})
+checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",osm2pgsql.OSMObject:new("dummyName",0,{-30, 49, -29, 50}))
 
 -- check with / (slash character) in the name
-checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",{114.15, 22.28, 114.2, 22.33})
-checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",nil)
+checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",osm2pgsql.OSMObject:new("dummyName",0,{114.15, 22.28, 114.2, 22.33}))
+checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",osm2pgsql.OSMObject:new("dummyName",0,nil))
 
 print("")
 
@@ -205,17 +212,17 @@ checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","Dr.-No-
 { ["name:de"]= "Doktor-No-Straße"},false,' - ','de')
 
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Doktor-No-Straße",'',
-{["name"]="Dr. No Street",["name:de"]="Doktor-No-Straße"},'de',nil)
+{["name"]="Dr. No Street",["name:de"]="Doktor-No-Straße"},'de',osm2pgsql.OSMObject:new("dummyName",0,nil))
 
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Doktor-No-Straße",'',
-{["name:de"]="Doktor-No-Straße"},'de',nil)
+{["name:de"]="Doktor-No-Straße"},'de',osm2pgsql.OSMObject:new("dummyName",0,nil))
 
 -- the (hoefully fictional) badly tagged capital of china
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","běi jīng",'',
-{["name"]="北京"},'de',nil)
+{["name"]="北京"},'de',osm2pgsql.OSMObject:new("Toukyou", 42,osm2pgsql.OSMObject:new("dummyName",0, nil)))
 -- Beijing in japanese transcription
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Pekin",'',
-{["name"]="北京"},'de',{ 138.79, 36.08, 139.51, 36.77 })
+{["name"]="北京"},'de',osm2pgsql.OSMObject:new("dummyName",0,{ 138.79, 36.08, 139.51, 36.77 }))
 
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ул. Воздвиженка - Vozdvizhenka St.‬",' - ',
 {["name"]= "улица Воздвиженка",["name:en"]= "Vozdvizhenka Street"},true,' - ','de')
