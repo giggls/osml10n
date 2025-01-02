@@ -156,13 +156,13 @@ checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港"
 checkoutput(osml10n.geo_transcript,"geo_transcript","hōeng góng",'42',"香港",{114.15, 22.28, 114.2, 22.33})
 
 -- cyrillic nowhere and anywhere on the atlantic
-checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",nil)
+checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́")
 -- international waters
 checkoutput(osml10n.geo_transcript,"geo_transcript","Moskvá",'42',"Москва́",{-30, 49, -29, 50})
 
 -- check with / (slash character) in the name
 checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",{114.15, 22.28, 114.2, 22.33})
-checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name",nil)
+checkoutput(osml10n.geo_transcript,"geo_transcript","some/name",'42',"some/name")
 
 print("")
 
