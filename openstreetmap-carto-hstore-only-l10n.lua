@@ -439,7 +439,7 @@ function remove_name_tags(tags)
     return next(tags) == nil
 end
 
-local function create_cols(tags)
+local function create_cols(tags, name_l10n)
     local cols = {}
     cols.tags = tags
     cols['layer'] = layer(tags['layer'])
@@ -463,7 +463,7 @@ function split_tags(tags, tag_map)
 end
 
 function add_line(tags, name_l10n, mgeom)
-    local cols = create_cols(tags)
+    local cols = create_cols(tags, name_l10n)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
         tables.line:insert(cols)
@@ -471,7 +471,7 @@ function add_line(tags, name_l10n, mgeom)
 end
 
 function add_roads(tags, name_l10n, mgeom)
-    local cols = create_cols(tags)
+    local cols = create_cols(tags, name_l10n)
     for sgeom in mgeom:geometries() do
         cols.way = sgeom
         tables.roads:insert(cols)
@@ -479,7 +479,7 @@ function add_roads(tags, name_l10n, mgeom)
 end
 
 function add_polygon(tags, name_l10n, poly)
-    local cols = create_cols(tags)
+    local cols = create_cols(tags, name_l10n)
     cols.way = poly
     cols.way_area = poly:area()
     tables.polygon:insert(cols)
@@ -521,7 +521,7 @@ function osm2pgsql.process_node(object)
     end
         
     if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-        names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+        names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, { object:get_bbox() })
         name_l10n = table2escapedarray(names)
         if remove_names then remove_name_tags(object.tags) end
     end
@@ -540,7 +540,7 @@ function osm2pgsql.process_way(object)
     local area_tags = isarea(object.tags)
     if object.is_closed and area_tags then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, { object:get_bbox() })
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
@@ -549,9 +549,9 @@ function osm2pgsql.process_way(object)
         -- on line/road use streetname function on highways
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
             if (object.tags['highway'] ~= nil) then
-                names = osml10n.get_names_from_tags(object.id, object.tags, true, true, lang, object.get_bbox)
+                names = osml10n.get_names_from_tags(object.id, object.tags, true, true, lang, { object:get_bbox() })
             else
-            	names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+            	names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, { object:get_bbox() })
             end
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
@@ -581,7 +581,7 @@ function osm2pgsql.process_relation(object)
     	if ((object.tags['admin_level'] == '2') and (object.tags['ISO3166-1:alpha2'] ~= nil)) then
     	    names = osml10n.get_country_name(object.tags, lang, true)
     	else
-    	    names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+    	    names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, { object:get_bbox() })
     	end
     	name_l10n = table2escapedarray(names)
     	if remove_names then remove_name_tags(object.tags) end
@@ -595,14 +595,14 @@ function osm2pgsql.process_relation(object)
 
     elseif type == "multipolygon" then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, { object:get_bbox() })
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
         add_polygon(object.tags, name_l10n, poly)
     elseif type == "route" then
         if ((object.tags['name'] ~= nil) or (object.tags['name:' .. lang] ~= nil)) then
-            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, object.get_bbox)
+            names = osml10n.get_names_from_tags(object.id, object.tags, true, false, lang, { object:get_bbox() })
             name_l10n = table2escapedarray(names)
             if remove_names then remove_name_tags(object.tags) end
         end
