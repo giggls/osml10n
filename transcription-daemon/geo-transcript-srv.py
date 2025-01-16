@@ -138,37 +138,45 @@ def contains_cjk(text):
   return False
 
 class transcriptor:
-  def __init__(self):
+  def __init__(self, boundaries):
 
     # ICU transliteration instance
     self.icutr = icu.Transliterator.createInstance('Any-Latin').transliterate
 
     # Kanji to Latin transcription instance via pykakasi
     self.kakasi = pykakasi.kakasi()
+    
+    self.boundaries = boundaries
+
+  def kanji_transcript(self, id, country, unistr):
+    kanji = self.kakasi.convert(unistr)
+    out = ""
+    for w in kanji:
+      w['hepburn'] = w['hepburn'].strip()
+      if (len(w['hepburn']) > 0):
+        out = out +  w['hepburn'].capitalize() + " "
+    return(out.strip())
 
   def transcript(self, id, country, unistr):
     if (country == ""):
-      vout("doing transcription for >>%s<< (generic, osm_id %s)\n" % (unistr,id))
+      vout("doing transcription for >>%s<< (generic, osm_id %s) as " % (unistr,id))
     else:
-      vout("doing transcription for >>%s<< (country %s, osm_id %s)\n" % (unistr,country,id))
-    if country == 'jp':
-      # this should mimic the old api behavior (I hate API changes)
-      # new API does not have all options anymore :(
-      kanji = self.kakasi.convert(unistr)
-      out = ""
-      for w in kanji:
-        w['hepburn'] = w['hepburn'].strip()
-        if (len(w['hepburn']) > 0):
-          out = out +  w['hepburn'].capitalize() + " "
-      return(out.strip())
+      vout("doing transcription for >>%s<< (country %s, osm_id %s) as " % (unistr,country,id))
 
-    if country == 'th':
-      return(thai_transcript(unistr))
-
-    if country in ['mo','hk']:
-      return(cantonese_transcript(unistr))
-
-    return(unicodedata.normalize('NFC', self.icutr(unistr)))
+    if country in self.boundaries:
+      if country == 'jp':
+        res = self.kanji_transcript(id, country, unistr)
+      elif country == 'th':
+        res = thai_transcript(unistr)
+      elif country in ['mo','hk']:
+        res = cantonese_transcript(unistr)
+      else:
+        res = unicodedata.normalize('NFC', self.icutr(unistr))
+    else:
+      res = unicodedata.normalize('NFC', self.icutr(unistr))
+    
+    vout(">>%s<<\n" % res)
+    return(res)
 
 class Coord2Country:
   features = []
@@ -192,13 +200,13 @@ class Coord2Country:
 
   def __init__(self, dirname):
     features = self.read_boundaries(dirname)
-    boundaries = []
+    self.boundaries = []
     for feature in features:
       geom = shapely.geometry.shape(feature["geometry"])
       cc = feature["properties"]["cc"]
-      boundaries.append(cc)
+      self.boundaries.append(cc)
       self.features.append([shapely.prepared.prep(geom), cc])
-    vout(f"Found boundaries: {boundaries}")
+    vout(f"Found boundaries: {self.boundaries}")
 
   def getCountry(self,id,lon,lat):
     if lon == '' or lat == '':
@@ -213,7 +221,7 @@ class Coord2Country:
     return ''
 
 co2c = Coord2Country(args.geomdir)
-tc = transcriptor()
+tc = transcriptor(co2c.boundaries)
 
 # Read a request from the socket. First read 4 bytes containing the length
 # of the request data, then read the data itself and return as a UTF-8 string.
