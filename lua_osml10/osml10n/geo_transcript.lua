@@ -52,4 +52,30 @@ function osml10n.geo_transcript(id,name,bbox)
 
 end
 
+function osml10n.country_transcript(id,name,country)
+  local reqbody
+  if (country == nil) then
+    reqbody = "CC/" .. id .. "/" .. "/" .. name
+  else
+    reqbody = "XY/" .. id .. "/" .. country .. "/" .. name
+  end
+
+  sock:send(string.pack('s4', reqbody))
+  lendata, msg = sock:receive(4)
+  if lendata == nil then
+    error(msg)
+  end
+  length = string.unpack('I4', lendata)
+  if (length > 0) then
+      local response, msg = sock:receive(length)
+      if response == nil then
+        error(msg)
+      end
+      return response
+  end
+  return ''
+
+end
+
+
 return osml10n

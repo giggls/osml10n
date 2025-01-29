@@ -6,6 +6,7 @@
 osml10n = require("osml10n")
 unaccent = require("unaccent")
 
+
 -- Wtf? I really think that a simple tostring method as in python should be part of any data-type
 function hash2string(hash)
   local string = "{ "
@@ -210,12 +211,19 @@ checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags",
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Doktor-No-Straße",'',
 {["name:de"]="Doktor-No-Straße"},'de',nil)
 
--- the (hoefully fictional) badly tagged capital of china
+-- the (hopefully fictional) badly tagged capital of china
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","běi jīng",'',
 {["name"]="北京"},'de',nil)
 -- Beijing in japanese transcription
 checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Pekin",'',
 {["name"]="北京"},'de',{ 138.79, 36.08, 139.51, 36.77 })
+
+-- name:ja-Hira should be used in favor of name and imply that this is always a place in Japan
+-- https://www.openstreetmap.org/node/9919330206
+checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","midoridainaka",'',
+{["name"]="緑台中", ["name:ja-Hira"]= "みどりだいなか"},'de',nil)
+checkoutput(osml10n.get_localized_name_from_tags,"get_localized_name_from_tags","Midori Taichuu",'',
+{["name"]="緑台中"},'de',{ 138.79, 36.08, 139.51, 36.77 })
 
 checkoutput(osml10n.get_streetname_from_tags,"get_streetname_from_tags","‪ул. Воздвиженка - Vozdvizhenka St.‬",' - ',
 {["name"]= "улица Воздвиженка",["name:en"]= "Vozdvizhenka Street"},true,' - ','de')

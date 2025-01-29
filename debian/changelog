@@ -1,3 +1,10 @@
+osml10n (1.3.0) unstable; urgency=medium
+
+  * change transcription semantic for japanese use name:ja-Hira if it exists
+    in favor of name.
+
+ -- Sven Geggus <sven-debian@geggus.net>  Wed, 29 Jan 2025 18:22:33 +0100
+
 osml10n (1.2.0) unstable; urgency=medium
 
   * get rid of deprecated sklearn package

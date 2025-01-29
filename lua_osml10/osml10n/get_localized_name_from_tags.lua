@@ -315,6 +315,14 @@ function osml10n.get_names_from_tags(id, tags, localized_name_last, is_street, t
         return osml10n.gen_combined_names(tag,tags,localized_name_last,is_street,true);
       end
     end
+
+    -- currently there are no streetname abbreviation functions for Japanese
+    -- and will likely make no sense anyway
+    if (tags['name:ja-Hira'] ~= nil) then
+      tags['name:l10n_Latn']=transcript.country_transcript(id,tags['name:ja-Hira'],'jp')
+      return osml10n.gen_combined_names('name:l10n_Latn',tags,localized_name_last,is_street);
+    end
+
     if is_street then
       tags['name:l10n_Latn']=transcript.geo_transcript(id,sabbrev.street_abbrev_non_latin(tags['name']),place)
     else
@@ -371,7 +379,12 @@ function osml10n.get_localized_name_from_tags(id, tags, targetlang, place)
         return tags[tag]
       end
     end
-    -- do transliteration as a last resort
+
+    -- do transcription as a last resort
+    if (tags['name:ja-Hira'] ~= nil) then
+      return transcript.geo_transcript(id,tags['name:ja-Hira'],'jp')
+    end
+
     return transcript.geo_transcript(id,tags['name'],place)
   else
     return ''
