@@ -93,7 +93,15 @@ abbrev_func_all.en = function(longname)
     {'Crescent%f[%A]','Cres.'},
     {'Court%f[%A]','Ct.'},
     {'Expressway%f[%A]','Expy.'},
-    {'Freeway%f[%A]','Fwy.'}}) do
+    {'Freeway%f[%A]','Fwy.'},
+    {'Trail%f[%A]', 'Trl.'},
+    {'Circle%f[%A]', 'Cir.'},
+    {'Way%f[%A]', 'Wy.'},
+    {'Terrace%f[%A]', 'Ter.'},
+    {'Highway%f[%A]', 'Hwy.'},
+    {'Passage%f[%A]', 'Pass.'},
+    {'Route%f[%A]', 'Rte.'}
+    }) do
     local a = string.gsub(abbrev,obj[1], obj[2])
     if a ~= abbrev then
      abbrev = a
@@ -106,7 +114,7 @@ abbrev_func_all.en = function(longname)
     {'South%f[%A]','S'},
     {'West%f[%A]','W'},
     {'East%f[%A]','E'},
-    {'Nortwest%f[%A]','NW'},
+    {'Northwest%f[%A]','NW'},
     {'Northeast%f[%A]','NE'},
     {'Southwest%f[%A]','SW'},
     {'Southeast%f[%A]','SE'}}) do
