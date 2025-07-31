@@ -107,8 +107,17 @@ abbrev_func_all.en = function(longname)
      abbrev = a
      break
     end
-  end 
+  end
 
+  for _,obj in ipairs({
+  {'%f[%a]Doctor%f[%A]', 'Dr.'},
+  {'%f[%a]Junior%f[%A]', 'Jr.'},
+  {'%f[%a]Saint%f[%A]', 'St.'},
+  {'%f[%a]Mount%f[%A]', 'Mt.'}
+}) do
+  abbrev = string.gsub(abbrev, obj[1], obj[2])
+end
+  
   for _,obj in ipairs({
     {'North%f[%A]','N'},
     {'South%f[%A]','S'},
