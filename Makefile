@@ -15,6 +15,7 @@ install: install-lua
 install-daemon: systemd-service
 	python3 -m venv $(PYTARGET)
 	$(PYTARGET)/bin/pip install .
+	chmod -R go+rwX $(PYTARGET)
 
 install-lua:
 	mkdir -p $(TARGETDIR)/share/lua/$(LUAV)
