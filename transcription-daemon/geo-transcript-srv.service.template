@@ -6,8 +6,8 @@ TimeoutStartSec=0
 Restart=always
 Type=notify
 NotifyAccess=all
-User=nobody
-Group=nogroup
+User=%NOBODY%
+Group=%NOGROUP%
 
 ExecStart=%PYTARGET%/bin/geo-transcript-srv.py -s
 # Max number of open files

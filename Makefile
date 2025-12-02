@@ -23,7 +23,11 @@ install-lua:
 	chmod -R go+rX $(TARGETDIR)/share/lua/$(LUAV)/osml10n
 
 systemd-service:
-	sed -e "s;%PYTARGET%;$(PYTARGET);g" transcription-daemon/geo-transcript-srv.service.template >/etc/systemd/system/osml10n.service
+	sed -e "s;%PYTARGET%;$(PYTARGET);g" \
+        -e "s;%NOBODY%;nobody;g" \
+        -e "s;%NOGROUP%;nogroup;g" \
+        transcription-daemon/geo-transcript-srv.service.template \
+        >/etc/systemd/system/osml10n.service
 
 test:
 	cd lua_osml10/tests/ && ./runtests.lua
