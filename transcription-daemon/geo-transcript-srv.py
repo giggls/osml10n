@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/home/sve25126/tmp/foo/bin/python3
 
 import argparse
 import asyncio
@@ -10,8 +10,8 @@ import shapely.geometry
 import shapely.prepared
 import struct
 import sys
-import pkg_resources
 from importlib.metadata import version
+import importlib.resources as resources
 
 # as imports are very slow parse arguments first
 parser = argparse.ArgumentParser(description='Server for transcription of names based on geolocation')
@@ -29,7 +29,7 @@ def vout(msg):
     sys.stdout.flush()
 
 try:
-  vers='version '+pkg_resources.require("osml10n")[0].version
+  vers='version ' + version("osml10n")
 except:
   vers='uninstalled version'
   if (args.geomdir == None):
@@ -187,10 +187,10 @@ class Coord2Country:
   def read_boundaries(dirname):
     features = []
     if dirname is None:
-      for path in pkg_resources.resource_listdir('osml10n','boundaries'):
-        if path.endswith('.geojson'):
-          f = pkg_resources.resource_string('osml10n','boundaries/' + path).decode('utf-8')
-          features.extend(json.loads(f)["features"])
+      for path in resources.files('osml10n').joinpath('boundaries').iterdir():
+        if path.suffix == '.geojson':
+          with open(path) as f:
+            features.extend(json.load(f)["features"])
     else:
       for path in pathlib.Path(dirname).iterdir():
         if path.is_file() and path.suffix == '.geojson':
