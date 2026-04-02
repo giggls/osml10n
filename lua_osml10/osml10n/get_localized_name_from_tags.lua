@@ -139,12 +139,10 @@ function osml10n.gen_combined_names(local_tag, tags, localized_name_last, is_str
   end
   unacc_local = unaccent.unaccent(local_name)
   found = false;
-  pos = string.find(unacc,unacc_local:gsub("%W", "%%%1"))
 
-  -- replace lua magic characters,
-  local escaped_unacc_local = string.gsub(unacc_local, '[.]', '::')
-  escaped_unacc_local = string.gsub(escaped_unacc_local, '[][()%%+*?^$]', '@')
-
+  -- unacc_local may contain lua magic characters so we need to escape them for string.find
+  local escaped_unacc_local = unacc_local:gsub("%W", "%%%1")
+  
   -- ignore localized_name_last option if localized_name_last is specified but our localized
   -- name is on position 1 in generic name tag.
   pos=string.find(' ' .. unacc .. ' ', '[][%s()-,;:/]' .. escaped_unacc_local .. '[][%s()-,;:/]')
