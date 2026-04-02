@@ -114,9 +114,11 @@ checkoutput(osml10n.contains_cyrillic,"contains_cyrillic",true,"улица Во�
 print("")
 checkoutput(osml10n.list2string,"list2string","Indien|भारत|India",{ "Indien", "भारत", "India" },'|')
 print("")
-checkoutput(osml10n.get_country_name,"get_country_name",{ "Indien", "भारत", "India" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "de")
-checkoutput(osml10n.get_country_name,"get_country_name",{ "भारत", "India", "Indien" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "de", true)
+checkoutput(osml10n.get_country_name,"get_country_name",{ "Indien", "भारत", "India" },{["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "de")
+checkoutput(osml10n.get_country_name,"get_country_name",{ "भारत", "India", "Indien" },{["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "de", true)
 checkoutput(osml10n.get_country_name,"get_country_name",{ "India", "भारत" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "en")
+checkoutput(osml10n.get_country_name,"get_country_name",{ "Tansania" } , {["ISO3166-1:alpha2"]= "TZ", ["name:de"] = "Tansania", ["name:sw"] = "Tanzania", ["name:en"] = "Tanzania"}, "de")
+checkoutput(osml10n.get_country_name,"get_country_name",{ "Zuid-Afrikaansche Republiek", "iNingizimu Afrika", "uMzantsi Afrika", "Südafrika" } , {["ISO3166-1:alpha2"]= "ZA",["name:de"] = "Südafrika",["name:af"] = "Zuid-Afrikaansche Republiek",["name:zu"] = "iNingizimu Afrika",["name:xh"] = "uMzantsi Afrika"}, "de", true)
 print("")
 
 local scriptdir = debug.getinfo(1).source:match("@?(.*/)")
@@ -170,6 +172,14 @@ print("")
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Москва́ - Moskau‬",'',{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },true, ' - ','de')
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Moskau|Москва́‬",'',{ ["name"] = "Москва́", ["name:de"] = "Moskau", ["name:en"] = "Moscow" },false, '|','de')
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","London",'',{ ["name"] = "London", ["name:de"] = "London", ["name:en"] = "London" },false, '|','de')
+
+-- name:de and name are different -> output both
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","‪Lissabon|Lisboa‬",'',
+{ ["name"] = "Lisboa", ["name:de"] = "Lissabon" }, false, '|','de')
+
+-- name:de is the same as name and contains a lua magic pattern
+checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags","Porto-Novo",'',
+{ ["name"] = "Porto-Novo", ["name:de"] = "Porto-Novo" }, false, '|','de')
 
 -- in lua rewriute default is 'en' for language
 checkoutput(osml10n.get_placename_from_tags,"get_placename_from_tags", "‪Cairo|القاهرة‬",'', { ["name"] = "القاهرة", ["name:de"] = "Kairo", ["int_name"] = "Cairo", ["name:en"] = "Cairo" },false, '|')
