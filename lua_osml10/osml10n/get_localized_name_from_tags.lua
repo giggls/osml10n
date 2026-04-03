@@ -145,7 +145,7 @@ function osml10n.gen_combined_names(local_tag, tags, localized_name_last, is_str
   
   -- ignore localized_name_last option if localized_name_last is specified but our localized
   -- name is on position 1 in generic name tag.
-  pos=string.find(' ' .. unacc .. ' ', '[][%s()-,;:/]' .. escaped_unacc_local .. '[][%s()-,;:/]')
+  pos=string.find(' ' .. unacc .. ' ', '[][%s()%-,;:/]' .. escaped_unacc_local .. '[][%s()%-,;:/]')
   if ((pos == 1) and localized_name_last)then
     dbgprint("forcing localized_name_last=false")
     localized_name_last=false
