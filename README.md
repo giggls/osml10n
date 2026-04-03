@@ -23,7 +23,7 @@ processing), which is what this code does.
 
 ## Implementation
 
-Localization functions are written in **Lua**, which has hase been chosen
+Localization functions are written in **Lua**, which has been chosen
 because this way the code can be easilly plugged into an
 [osm2pgsql](https://osm2pgsql.org) tag transformation script when importing
 Openstreetmap data into **PostgreSQL** which is certainly the most common
