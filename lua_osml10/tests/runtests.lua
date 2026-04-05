@@ -119,6 +119,11 @@ checkoutput(osml10n.get_country_name,"get_country_name",{ "भारत", "India
 checkoutput(osml10n.get_country_name,"get_country_name",{ "India", "भारत" } , {["ISO3166-1:alpha2"]= "IN", ["name:de"] = "Indien", ["name:hi"] = "भारत", ["name:en"] = "India"}, "en")
 checkoutput(osml10n.get_country_name,"get_country_name",{ "Tansania" } , {["ISO3166-1:alpha2"]= "TZ", ["name:de"] = "Tansania", ["name:sw"] = "Tanzania", ["name:en"] = "Tanzania"}, "de")
 checkoutput(osml10n.get_country_name,"get_country_name",{ "Zuid-Afrikaansche Republiek", "iNingizimu Afrika", "uMzantsi Afrika", "Südafrika" } , {["ISO3166-1:alpha2"]= "ZA",["name:de"] = "Südafrika",["name:af"] = "Zuid-Afrikaansche Republiek",["name:zu"] = "iNingizimu Afrika",["name:xh"] = "uMzantsi Afrika"}, "de", true)
+-- San Marion Problem: Main language is "it" but name:it is not tagged
+checkoutput(osml10n.get_country_name,"get_country_name",{ "San Marino" },{["ISO3166-1:alpha2"]= "SM", ["name:de"] = "San Marino", ["name"] = "San Marino"}, "de")
+-- Name in target language not set
+checkoutput(osml10n.get_country_name,"get_country_name",{ "Andorra" },{["ISO3166-1:alpha2"]= "AD", ["name:ca"] = "Andorra"}, "de", false)
+
 print("")
 
 local scriptdir = debug.getinfo(1).source:match("@?(.*/)")

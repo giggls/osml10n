@@ -47,7 +47,8 @@ function osml10n.get_country_name(tags, targetlang, append)
   local ldistall
   local ldist
   local names = {}
-  -- append name in target language
+
+  -- append name in target language (does nothing if tags["name:" .. targetlang] is nil)
   if (append ~= true) then
     table.insert(names,tags["name:" .. targetlang])
   end
@@ -56,7 +57,7 @@ function osml10n.get_country_name(tags, targetlang, append)
   -- generate an array of all official country names
   languages = langs[string.lower(tags["ISO3166-1:alpha2"])]
   for k,v in pairs(languages) do
-    if (tags["name:" .. v] ~= tags["name:" .. targetlang]) then
+    if ((tags["name:" .. v] ~= nil) and (tags["name:" .. v] ~= tags["name:" .. targetlang])) then
       -- make sure that ldistall is always bigger than ldistmin by default
       ldistall=ldistmin + 1
       for _,name in ipairs(names) do
@@ -74,10 +75,8 @@ function osml10n.get_country_name(tags, targetlang, append)
       count = count + 1
     end
   end
-  if count == 0 then
-    table.insert(names,"")
-  end
   if append then
+    -- does nothing if tags["name:" .. targetlang] is nil
     table.insert(names,tags["name:" .. targetlang])
   end
   
