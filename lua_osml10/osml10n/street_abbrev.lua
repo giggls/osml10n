@@ -138,6 +138,7 @@ end
 end
 
 -- replaces some common parts of French street names with their abbreviation
+-- * See rules of the french post: https://www.laposte.fr/envoyer/abreviation-adresses-postales
 abbrev_func_all.fr = function(longname)
   local abbrev = longname
   -- These are also French names and Avenue is not at the beginning of the Name
@@ -154,6 +155,7 @@ abbrev_func_all.fr = function(longname)
     {'^Boulevard%f[%A]','Bd'},
     {'^Chemin%f[%A]','Ch.'},
     {'^Esplanade%f[%A]','Espl.'},
+    {'^Faubourg%f[%A]','Faub.'},
     {'^Impasse%f[%A]','Imp.'},
     {'^Passage%f[%A]','Pass.'},
     {'^Promenade%f[%A]','Prom.'},
